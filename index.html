@@ -176,7 +176,7 @@ header {
   position: absolute;
   background: var(--card-bg);
   border-radius: var(--card-radius);
-  padding: var(--card-padding);
+  padding: 16px 8px 8px 8px;
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
@@ -287,24 +287,21 @@ header {
 /* Contenedor de columnas */
 .card-grid {
   display: grid;
-  gap: 8px;
+  gap: 0px 4px;
   width: 100%;
 }
-
-.card-grid.cols-1 { grid-template-columns: 1fr; }
-.card-grid.cols-2 { grid-template-columns: 1fr 1fr; }
-.card-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
 
 .card-title {
   font-size: 14px;
   font-weight: 600;
   color: #2a2a28;
   margin-bottom: 8px;
-  padding: 4px 6px 6px 6px;
+  margin-top: -8px;
+  padding: 0px 6px 6px 6px;
   border-radius: 0;
   background: transparent;
   border: none;
-  border-bottom: 2px solid #a8a8a6;
+  border-bottom: 0.5px solid #d0d0ce;
   transition: all 0.15s;
   cursor: text;
   min-height: 20px;
@@ -330,9 +327,10 @@ header {
 
 .cell {
   background: transparent;
-  border: 1px solid #b0b0ae !important;
-  border-radius: 4px;
-  padding: 6px 8px;
+  border: none;
+  border-bottom: 0.5px solid #d0d0ce;
+  border-radius: 0;
+  padding: 6px 12px;
   font-size: 12px;
   color: #2a2a28;
   min-height: 32px;
@@ -348,27 +346,27 @@ header {
 
 .cell:hover {
   background: transparent;
-  border-color: #888886 !important;
+  border-bottom-color: #b8b8b6;
 }
 
 .cell:focus {
   outline: none;
   background: #fafaf8;
-  border-color: #88cc00 !important;
+  border-bottom-color: #88cc00;
   box-shadow: 0 0 6px rgba(136, 204, 0, 0.2);
 }
 
 .cell[contenteditable="true"] {
   background: #fafaf8;
-  border-color: #88cc00 !important;
+  border-bottom-color: #88cc00;
   padding: 4px 6px;
 }
 
 .card-grid {
   display: grid;
-  gap: 6px;
+  gap: 0px 4px;
   width: 100%;
-  grid-auto-columns: minmax(60px, 1fr);
+  grid-auto-columns: auto;
 }
 
 .cell-wrapper {
@@ -602,6 +600,7 @@ function setupEventListeners() {
     btn.addEventListener('click', (e) => {
       state.bordeSeleccionado = e.target.dataset.borde;
       updateBordeButtons();
+      // Aplicar inmediatamente
       if (state.tarjetaSeleccionada) {
         aplicarBorde();
       }
@@ -778,7 +777,7 @@ function renderCards() {
     // Grid
     const grid = document.createElement('div');
     grid.className = 'card-grid';
-    grid.style.gridTemplateColumns = `repeat(${card.cols}, minmax(60px, 1fr))`;
+    grid.style.gridTemplateColumns = `repeat(${card.cols}, auto)`;
     
     const numFilas = card.contenido.length;
     for (let fila = 0; fila < numFilas; fila++) {
@@ -787,7 +786,8 @@ function renderCards() {
         cell.className = 'cell';
         cell.contentEditable = 'false';
         cell.spellcheck = 'false';
-        cell.textContent = card.contenido[fila]?.[col] || '';
+        // Cargar innerHTML para mostrar <br>
+        cell.innerHTML = card.contenido[fila]?.[col] || '';
         cell.dataset.fila = fila;
         cell.dataset.col = col;
         
@@ -801,7 +801,8 @@ function renderCards() {
         cell.addEventListener('blur', () => {
           cell.contentEditable = 'false';
           if (!card.contenido[fila]) card.contenido[fila] = [];
-          card.contenido[fila][col] = cell.textContent;
+          // Guardar innerHTML para preservar <br>
+          card.contenido[fila][col] = cell.innerHTML;
           saveToStorage();
         });
         
@@ -815,11 +816,8 @@ function renderCards() {
             }
           } else if (e.key === 'Enter') {
             e.preventDefault();
-            const nextFila = fila + 1;
-            if (nextFila < numFilas) {
-              const nextCell = grid.querySelector(`[data-fila="${nextFila}"][data-col="${col}"]`);
-              if (nextCell) nextCell.focus();
-            }
+            // Insertar un <br> en lugar de crear un div
+            document.execCommand('insertLineBreak');
           }
         });
         
@@ -956,10 +954,13 @@ function onPointerDown(ev) {
     const rectMesa = mesa.getBoundingClientRect();
     const rectCard = cardEl.getBoundingClientRect();
     
+    // Calcular offset desde el punto de toque al top-left de la tarjeta
     dragInfo = {
       cardId,
-      ox: ev.clientX - rectCard.left,
-      oy: ev.clientY - rectCard.top,
+      startX: parseInt(cardEl.style.left) || 0,
+      startY: parseInt(cardEl.style.top) || 0,
+      touchStartX: ev.clientX,
+      touchStartY: ev.clientY,
       maxX: rectMesa.width - rectCard.width,
       maxY: rectMesa.height - rectCard.height,
       rectMesa
@@ -980,14 +981,23 @@ function onPointerMove(ev) {
   pointers.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
   
   if (modo === 'arrastre' && pointers.size === 1 && dragInfo) {
-    const nx = Math.min(Math.max(0, ev.clientX - dragInfo.rectMesa.left - dragInfo.ox), dragInfo.maxX);
-    const ny = Math.min(Math.max(0, ev.clientY - dragInfo.rectMesa.top - dragInfo.oy), dragInfo.maxY);
+    // Calcular delta desde el inicio del toque
+    const deltaX = ev.clientX - dragInfo.touchStartX;
+    const deltaY = ev.clientY - dragInfo.touchStartY;
+    
+    // Nueva posición = posición inicial + delta
+    let newX = dragInfo.startX + deltaX;
+    let newY = dragInfo.startY + deltaY;
+    
+    // Limitar dentro de la mesa
+    newX = Math.max(0, Math.min(newX, dragInfo.maxX));
+    newY = Math.max(0, Math.min(newY, dragInfo.maxY));
     
     const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const card = tarjetas.find(c => c.id === dragInfo.cardId);
     if (card) {
-      card.x = nx;
-      card.y = ny;
+      card.x = newX;
+      card.y = newY;
       renderCards();
     }
   } else if (modo === 'pellizco' && pointers.size === 2 && pinchInicial) {
