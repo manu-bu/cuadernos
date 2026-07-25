@@ -180,7 +180,7 @@ header {
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: manipulation;
+  touch-action: none;
   
   /* Default: borde simple gris */
   border: var(--card-border-w) solid #d4d4d2;
@@ -228,11 +228,60 @@ header {
   border: var(--card-border-w) solid #6FCF3D;
 }
 
-.card.borde-gradient {
+.card.borde-terreno {
   border: var(--card-border-w) solid transparent;
   background:
     linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
-    linear-gradient(135deg, #8557D4, #CCB0E3) border-box;
+    linear-gradient(135deg, #8B7B6F, #D9CFC4) border-box;
+}
+
+.card.borde-flora {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #6FCF3D, #C5EBA8) border-box;
+}
+
+.card.borde-verano {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #f0d878, #f5e6b0) border-box;
+}
+
+.card.borde-clima {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from 0deg, #ffffff 0deg, #b0b0ae 75deg, #8ec6e0 190deg, #f0d878 280deg, #f0a8c0 320deg, #ffffff 360deg) border-box;
+}
+
+.card.borde-terreno {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #8B7B6F, #D9CFC4) border-box;
+}
+
+.card.borde-flora {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #6FCF3D, #C5EBA8) border-box;
+}
+
+.card.borde-verano {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #f0d878, #f5e6b0) border-box;
+}
+
+.card.borde-clima {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from 0deg, #ffffff 0deg, #b0b0ae 75deg, #8ec6e0 190deg, #f0d878 280deg, #f0a8c0 320deg, #ffffff 360deg) border-box;
 }
 
 /* Contenedor de columnas */
@@ -246,20 +295,110 @@ header {
 .card-grid.cols-2 { grid-template-columns: 1fr 1fr; }
 .card-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
 
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2a2a28;
+  margin-bottom: 8px;
+  padding: 4px 6px 6px 6px;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #a8a8a6;
+  transition: all 0.15s;
+  cursor: text;
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.card-title:hover {
+  background: transparent;
+  border-bottom-color: #888886;
+}
+
+.card-title:focus {
+  outline: none;
+  background: transparent;
+  border-bottom-color: #88cc00;
+}
+
+.card-title[contenteditable="true"] {
+  background: transparent;
+  border-bottom-color: #88cc00;
+}
+
 .cell {
-  background: #f9f9f7;
-  border: 1px solid #e0e0de;
-  border-radius: 8px;
-  padding: 8px;
+  background: transparent;
+  border: 1px solid #b0b0ae !important;
+  border-radius: 4px;
+  padding: 6px 8px;
   font-size: 12px;
-  color: #6a6a68;
-  min-height: 40px;
+  color: #2a2a28;
+  min-height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   word-break: break-word;
+  cursor: text;
+  transition: all 0.15s;
+  white-space: pre-wrap;
 }
+
+.cell:hover {
+  background: transparent;
+  border-color: #888886 !important;
+}
+
+.cell:focus {
+  outline: none;
+  background: #fafaf8;
+  border-color: #88cc00 !important;
+  box-shadow: 0 0 6px rgba(136, 204, 0, 0.2);
+}
+
+.cell[contenteditable="true"] {
+  background: #fafaf8;
+  border-color: #88cc00 !important;
+  padding: 4px 6px;
+}
+
+.card-grid {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  grid-auto-columns: minmax(60px, 1fr);
+}
+
+.cell-wrapper {
+  display: contents;
+}
+
+.row-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  font-size: 10px;
+  padding: 4px;
+}
+
+.row-actions button {
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 0.5px solid #d4d4d2;
+  background: #ffffff;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.row-actions button:hover {
+  border-color: #888886;
+  background: #f0f0ee;
+}
+
+
 
 /* ===== PANEL DERECHO (EDITOR DETALLES) ===== */
 .panel-derecho {
@@ -359,10 +498,18 @@ header {
       <button class="panel-btn" data-borde="borde-punteado">Punteado</button>
       <button class="panel-btn" data-borde="borde-doble">Doble</button>
       <button class="panel-btn" data-borde="borde-grosor">Grueso</button>
+    </div>
+    <div class="panel-label" style="margin-top: 12px;">Colores</div>
+    <div class="panel-buttons">
       <button class="panel-btn" data-borde="borde-color-a">Rojo</button>
       <button class="panel-btn" data-borde="borde-color-b">Azul</button>
       <button class="panel-btn" data-borde="borde-color-c">Verde</button>
-      <button class="panel-btn" data-borde="borde-gradient">Gradiente</button>
+    </div>
+    <div class="panel-label" style="margin-top: 12px;">Gradientes</div>
+    <div class="panel-buttons">
+      <button class="panel-btn" data-borde="borde-clima">Clima</button>
+      <button class="panel-btn" data-borde="borde-terreno">Terreno</button>
+      <button class="panel-btn" data-borde="borde-flora">Flora</button>
     </div>
   </div>
   
@@ -374,13 +521,18 @@ header {
     </div>
   </div>
   
-  <div class="panel-section">
-    <div class="panel-label">Columnas</div>
+  <div class="panel-section" id="seccionGridAbierta" style="display: none;">
+    <div class="panel-label">Filas y Columnas</div>
     <div class="panel-buttons">
-      <button class="panel-btn" data-cols="1">1</button>
-      <button class="panel-btn" data-cols="2">2</button>
-      <button class="panel-btn" data-cols="3">3</button>
+      <button class="panel-btn" id="btnAddRow">+ Fila</button>
+      <button class="panel-btn" id="btnDelRow">- Fila</button>
+      <button class="panel-btn" id="btnAddCol">+ Columna</button>
+      <button class="panel-btn" id="btnDelCol">- Columna</button>
     </div>
+  </div>
+  
+  <div class="panel-section" id="seccionBorrar" style="display: none;">
+    <button class="panel-btn" id="btnBorrarTarjeta" style="width: 100%; background: #ffe6e6; border-color: #e24b4a; color: #a32d2d;">Borrar tarjeta</button>
   </div>
 </div>
 
@@ -456,15 +608,65 @@ function setupEventListeners() {
     });
   });
   
-  // Panel editor - columnas
-  document.querySelectorAll('[data-cols]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      state.colsSeleccionadas = parseInt(e.target.dataset.cols);
-      updateColsButtons();
-      if (state.tarjetaSeleccionada) {
-        aplicarCols();
-      }
-    });
+  // Panel editor - filas y columnas
+  document.getElementById('btnAddRow').addEventListener('click', () => {
+    if (!state.tarjetaSeleccionada) return;
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
+    if (card) {
+      card.contenido.push(new Array(card.cols).fill(''));
+      renderCards();
+      saveToStorage();
+    }
+  });
+  
+  document.getElementById('btnDelRow').addEventListener('click', () => {
+    if (!state.tarjetaSeleccionada) return;
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
+    if (card && card.contenido.length > 1) {
+      card.contenido.pop();
+      renderCards();
+      saveToStorage();
+    }
+  });
+  
+  document.getElementById('btnAddCol').addEventListener('click', () => {
+    if (!state.tarjetaSeleccionada) return;
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
+    if (card) {
+      card.cols++;
+      card.contenido.forEach(row => row.push(''));
+      renderCards();
+      saveToStorage();
+    }
+  });
+  
+  document.getElementById('btnDelCol').addEventListener('click', () => {
+    if (!state.tarjetaSeleccionada) return;
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
+    if (card && card.cols > 1) {
+      card.cols--;
+      card.contenido.forEach(row => row.pop());
+      renderCards();
+      saveToStorage();
+    }
+  });
+  
+  document.getElementById('btnBorrarTarjeta').addEventListener('click', () => {
+    if (!state.tarjetaSeleccionada) return;
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const idx = tarjetas.findIndex(c => c.id === state.tarjetaSeleccionada);
+    if (idx !== -1) {
+      tarjetas.splice(idx, 1);
+      state.tarjetaSeleccionada = null;
+      document.getElementById('seccionGridAbierta').style.display = 'none';
+      document.getElementById('seccionBorrar').style.display = 'none';
+      renderCards();
+      saveToStorage();
+    }
   });
   
   // Panel editor - aplicar a
@@ -478,13 +680,21 @@ function setupEventListeners() {
     updateAplicarButtons();
   });
   
-  // Mesa
+  // Mesa - pointer events
   const mesa = document.getElementById('mesa');
-  let touchStartDistance = 0;
-  
-  mesa.addEventListener('touchstart', handleTouchStart);
-  mesa.addEventListener('touchmove', handleTouchMove);
-  mesa.addEventListener('touchend', handleTouchEnd);
+  mesa.addEventListener('pointerdown', onPointerDown);
+  mesa.addEventListener('click', (e) => {
+    // Si clickeás en la mesa directamente (no en una tarjeta), deselecciona
+    if (e.target === mesa) {
+      state.tarjetaSeleccionada = null;
+      document.getElementById('seccionGridAbierta').style.display = 'none';
+      document.getElementById('seccionBorrar').style.display = 'none';
+      renderCards();
+    }
+  });
+  document.addEventListener('pointermove', onPointerMove);
+  document.addEventListener('pointerup', onPointerUp);
+  document.addEventListener('pointercancel', onPointerUp);
 }
 
 // ===== AGREGAR TARJETA =====
@@ -497,8 +707,12 @@ function addCard() {
     y: 100 + Math.random() * 200,
     scale: 1,
     borde: 'borde-simple',
-    cols: 1,
-    contenido: [['Tarjeta ' + id]]
+    cols: 2,
+    titulo: 'Nueva tarjeta',
+    contenido: [
+      ['', ''],
+      ['', '']
+    ]
   };
   tarjetas.push(newCard);
   selectCard(id);
@@ -513,6 +727,11 @@ function renderCards() {
   
   const tarjetas = state.datos[state.unidadActual][state.temaActual] || [];
   
+  // Ocultar sección si no hay tarjeta seleccionada
+  if (!state.tarjetaSeleccionada) {
+    document.getElementById('seccionGridAbierta').style.display = 'none';
+  }
+  
   tarjetas.forEach(card => {
     const cardEl = document.createElement('div');
     cardEl.className = `card ${card.borde}`;
@@ -525,21 +744,107 @@ function renderCards() {
     cardEl.style.transform = `scale(${card.scale})`;
     cardEl.dataset.id = card.id;
     
+    // Contenedor de contenido
+    const contentContainer = document.createElement('div');
+    
+    // Título
+    const title = document.createElement('div');
+    title.className = 'card-title';
+    title.contentEditable = 'false';
+    title.spellcheck = 'false';
+    title.textContent = card.titulo || 'Tarjeta ' + card.id;
+    
+    // Al clickear, pasar a editable
+    title.addEventListener('click', (e) => {
+      e.stopPropagation();
+      title.contentEditable = 'true';
+      title.focus();
+    });
+    
+    title.addEventListener('blur', () => {
+      title.contentEditable = 'false';
+      card.titulo = title.textContent;
+      saveToStorage();
+    });
+    
+    title.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        title.blur();
+      }
+    });
+    contentContainer.appendChild(title);
+    
     // Grid
     const grid = document.createElement('div');
-    grid.className = `card-grid cols-${card.cols}`;
+    grid.className = 'card-grid';
+    grid.style.gridTemplateColumns = `repeat(${card.cols}, minmax(60px, 1fr))`;
     
-    for (let i = 0; i < card.cols; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'cell';
-      cell.textContent = card.contenido[i]?.[0] || '';
-      grid.appendChild(cell);
+    const numFilas = card.contenido.length;
+    for (let fila = 0; fila < numFilas; fila++) {
+      for (let col = 0; col < card.cols; col++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.contentEditable = 'false';
+        cell.spellcheck = 'false';
+        cell.textContent = card.contenido[fila]?.[col] || '';
+        cell.dataset.fila = fila;
+        cell.dataset.col = col;
+        
+        // Al clickear, pasar a editable
+        cell.addEventListener('click', (e) => {
+          e.stopPropagation();
+          cell.contentEditable = 'true';
+          cell.focus();
+        });
+        
+        cell.addEventListener('blur', () => {
+          cell.contentEditable = 'false';
+          if (!card.contenido[fila]) card.contenido[fila] = [];
+          card.contenido[fila][col] = cell.textContent;
+          saveToStorage();
+        });
+        
+        cell.addEventListener('keydown', (e) => {
+          if (e.key === 'Tab') {
+            e.preventDefault();
+            const nextCol = col + 1;
+            if (nextCol < card.cols) {
+              const nextCell = grid.querySelector(`[data-fila="${fila}"][data-col="${nextCol}"]`);
+              if (nextCell) nextCell.focus();
+            }
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            const nextFila = fila + 1;
+            if (nextFila < numFilas) {
+              const nextCell = grid.querySelector(`[data-fila="${nextFila}"][data-col="${col}"]`);
+              if (nextCell) nextCell.focus();
+            }
+          }
+        });
+        
+        grid.appendChild(cell);
+      }
     }
     
-    cardEl.appendChild(grid);
+    contentContainer.appendChild(grid);
+    cardEl.appendChild(contentContainer);
     
-    // Eventos
-    cardEl.addEventListener('click', () => selectCard(card.id));
+    // Eventos de la tarjeta
+    cardEl.addEventListener('pointerdown', (e) => {
+      // Si clickeás una celda, que se enfoque para editar
+      if (e.target.classList.contains('cell')) {
+        e.target.focus();
+        return;
+      }
+      // Si clickeás el título, que se enfoque
+      if (e.target.classList.contains('card-title')) {
+        e.target.focus();
+        return;
+      }
+      // Si clickeás en otro lado de la tarjeta, seleccioná la tarjeta
+      selectCard(card.id);
+    });
     
     mesa.appendChild(cardEl);
   });
@@ -554,6 +859,8 @@ function selectCard(id) {
     state.colsSeleccionadas = tarjeta.cols;
     updateBordeButtons();
     updateColsButtons();
+    document.getElementById('seccionGridAbierta').style.display = 'block';
+    document.getElementById('seccionBorrar').style.display = 'block';
   }
   renderCards();
 }
@@ -601,56 +908,115 @@ function aplicarCols() {
   saveToStorage();
 }
 
-// ===== TOUCH HANDLERS =====
-let activeTouchId = null;
+// ===== POINTER EVENTS (como Letritas) =====
+const pointers = new Map();
+let dragInfo = null;
+let pinchInicial = null;
+let modo = null;
 
-function handleTouchStart(e) {
-  if (e.touches.length === 1) {
-    const touch = e.touches[0];
-    const cardEl = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (cardEl?.classList.contains('card')) {
-      activeTouchId = cardEl.dataset.id;
-      selectCard(parseInt(activeTouchId));
-    }
-  } else if (e.touches.length === 2) {
-    const dx = e.touches[0].clientX - e.touches[1].clientX;
-    const dy = e.touches[0].clientY - e.touches[1].clientY;
-    touchStartDistance = Math.sqrt(dx * dx + dy * dy);
+function distanciaEntre(p1, p2) {
+  return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+}
+
+function escalaActual() {
+  const tarjeta = document.querySelector(`[data-id="${state.tarjetaSeleccionada}"]`);
+  if (!tarjeta) return 1;
+  const match = tarjeta.style.transform.match(/scale\(([\d.]+)\)/);
+  return match ? parseFloat(match[1]) : 1;
+}
+
+function aplicarEscala(cardId, escala) {
+  const tarjeta = document.querySelector(`[data-id="${cardId}"]`);
+  if (tarjeta) {
+    tarjeta.style.transform = `scale(${escala})`;
   }
 }
 
-function handleTouchMove(e) {
-  if (e.touches.length === 1 && activeTouchId) {
-    e.preventDefault();
-    const touch = e.touches[0];
+function onPointerDown(ev) {
+  // Si estamos editando (contentEditable activo), no hacer nada
+  if (document.activeElement?.contentEditable === 'true') return;
+  
+  const cardEl = ev.target.closest('.card');
+  if (!cardEl) return;
+  
+  // Si el target es una celda o título, no iniciar drag
+  if (ev.target.classList.contains('cell') || ev.target.classList.contains('card-title')) {
+    return;
+  }
+  
+  const cardId = parseInt(cardEl.dataset.id);
+  selectCard(cardId);
+  
+  pointers.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+  
+  if (pointers.size === 1) {
+    ev.preventDefault();
+    modo = 'arrastre';
+    const mesa = document.getElementById('mesa');
+    const rectMesa = mesa.getBoundingClientRect();
+    const rectCard = cardEl.getBoundingClientRect();
+    
+    dragInfo = {
+      cardId,
+      ox: ev.clientX - rectCard.left,
+      oy: ev.clientY - rectCard.top,
+      maxX: rectMesa.width - rectCard.width,
+      maxY: rectMesa.height - rectCard.height,
+      rectMesa
+    };
+  } else if (pointers.size === 2) {
+    ev.preventDefault();
+    modo = 'pellizco';
+    const pts = Array.from(pointers.values());
+    pinchInicial = { 
+      distancia: distanciaEntre(pts[0], pts[1]), 
+      escala: escalaActual() 
+    };
+  }
+}
+
+function onPointerMove(ev) {
+  if (!pointers.has(ev.pointerId)) return;
+  pointers.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+  
+  if (modo === 'arrastre' && pointers.size === 1 && dragInfo) {
+    const nx = Math.min(Math.max(0, ev.clientX - dragInfo.rectMesa.left - dragInfo.ox), dragInfo.maxX);
+    const ny = Math.min(Math.max(0, ev.clientY - dragInfo.rectMesa.top - dragInfo.oy), dragInfo.maxY);
+    
     const tarjetas = state.datos[state.unidadActual][state.temaActual];
-    const card = tarjetas.find(c => c.id === parseInt(activeTouchId));
+    const card = tarjetas.find(c => c.id === dragInfo.cardId);
     if (card) {
-      card.x = touch.clientX - 60; // Offset aproximado
-      card.y = touch.clientY - 40;
+      card.x = nx;
+      card.y = ny;
       renderCards();
     }
-  } else if (e.touches.length === 2) {
-    e.preventDefault();
-    const dx = e.touches[0].clientX - e.touches[1].clientX;
-    const dy = e.touches[0].clientY - e.touches[1].clientY;
-    const newDistance = Math.sqrt(dx * dx + dy * dy);
-    const ratio = newDistance / (touchStartDistance || 1);
+  } else if (modo === 'pellizco' && pointers.size === 2 && pinchInicial) {
+    const pts = Array.from(pointers.values());
+    const factor = distanciaEntre(pts[0], pts[1]) / pinchInicial.distancia;
+    const nueva = Math.min(2.5, Math.max(0.5, pinchInicial.escala * factor));
     
     const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card) {
-      card.scale = Math.max(0.5, Math.min(2, card.scale * ratio));
+      card.scale = nueva;
+      renderCards();
     }
-    touchStartDistance = newDistance;
-    renderCards();
   }
 }
 
-function handleTouchEnd(e) {
-  if (e.touches.length === 0) {
-    activeTouchId = null;
+function onPointerUp(ev) {
+  pointers.delete(ev.pointerId);
+  
+  if (modo === 'arrastre' && dragInfo) {
     saveToStorage();
+  } else if (modo === 'pellizco') {
+    saveToStorage();
+  }
+  
+  if (pointers.size < 2) {
+    modo = null;
+    dragInfo = null;
+    pinchInicial = null;
   }
 }
 
