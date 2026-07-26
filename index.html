@@ -78,10 +78,14 @@ header {
   font-size: 14px;
   color: var(--sel-color);
   font-weight: 600;
+  font-family: var(--font);
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
   text-transform: uppercase;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
 
 .selector:hover {
@@ -107,6 +111,7 @@ header {
   border: var(--sel-border) solid #b8b8b6;
   background: #ffffff;
   font-size: 20px;
+  font-family: var(--font);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -296,17 +301,18 @@ header {
   font-weight: 600;
   color: #2a2a28;
   margin-bottom: 8px;
-  margin-top: -8px;
-  padding: 0px 6px 6px 6px;
+  margin-top: -16px;
+  padding: 0px 6px 2px 6px;
   border-radius: 0;
   background: transparent;
   border: none;
-  border-bottom: 0.5px solid #d0d0ce;
+  border-bottom: 0.3px solid #e0e0de;
   transition: all 0.15s;
   cursor: text;
   min-height: 20px;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+  justify-content: flex-start;
 }
 
 .card-title:hover {
@@ -328,14 +334,14 @@ header {
 .cell {
   background: transparent;
   border: none;
-  border-bottom: 0.5px solid #d0d0ce;
+  border-bottom: 0.3px dotted #e0e0de;
   border-radius: 0;
   padding: 6px 12px;
   font-size: 12px;
   color: #2a2a28;
-  min-height: 32px;
+  min-height: 20px;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   text-align: center;
   word-break: break-word;
@@ -387,6 +393,7 @@ header {
   border: 0.5px solid #d4d4d2;
   background: #ffffff;
   font-size: 10px;
+  font-family: var(--font);
   cursor: pointer;
   transition: all 0.1s;
 }
@@ -438,6 +445,7 @@ header {
   font-size: 18px;
   font-weight: 700;
   color: #2a2a28;
+  font-family: var(--font);
 }
 
 .btn-cerrar {
@@ -447,6 +455,7 @@ header {
   border: none;
   background: #f0f0ee;
   font-size: 16px;
+  font-family: var(--font);
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -523,7 +532,7 @@ header {
   border-radius: 4px;
   padding: 4px 8px;
   font-size: 13px;
-  font-family: inherit;
+  font-family: var(--font);
   background: #ffffff;
 }
 
@@ -596,6 +605,7 @@ header {
   font-size: 12px;
   font-weight: 700;
   color: #6a6a68;
+  font-family: var(--font);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
@@ -615,6 +625,7 @@ header {
   border: 1px solid #d4d4d2;
   background: #ffffff;
   font-size: 11px;
+  font-family: var(--font);
   cursor: pointer;
   transition: all 0.15s;
   text-align: center;
@@ -1007,9 +1018,8 @@ function renderEstructura() {
     item.dataset.unidad = unidad;
     
     item.innerHTML = `
-      <span class="estructura-nombre">${'Unidad ' + unidad}</span>
+      <span class="estructura-nombre" contenteditable="false" data-unidad="${unidad}" data-type="unidad">Unidad ${unidad}</span>
       <div class="estructura-botones">
-        <button class="btn-mini-modal editar" title="Editar nombre" data-action="editar" data-unidad="${unidad}">✏️</button>
         <button class="btn-mini-modal agregar" title="Agregar unidad" data-action="agregarUnidad" data-unidad="${unidad}">+</button>
         <button class="btn-mini-modal borrar" title="Borrar unidad" data-action="borrar" data-unidad="${unidad}">−</button>
       </div>
@@ -1030,16 +1040,17 @@ function renderEstructura() {
   listaTemas.innerHTML = '';
   
   if (unidadSeleccionadaModal && state.datos[unidadSeleccionadaModal]) {
-    const temasKeys = Object.keys(state.datos[unidadSeleccionadaModal]);
+    const temasKeys = Object.keys(state.datos[unidadSeleccionadaModal])
+      .filter(k => k !== '_nombre');  // Filtrar _nombre
     temasKeys.forEach((tema, idx) => {
       const item = document.createElement('div');
       item.className = 'estructura-item';
       item.dataset.tema = tema;
       
+      const nombreTema = state.datos[unidadSeleccionadaModal][tema]?._nombre || ('Tema ' + tema);
       item.innerHTML = `
-        <span class="estructura-nombre">Tema ${tema}</span>
+        <span class="estructura-nombre" contenteditable="false" data-unidad="${unidadSeleccionadaModal}" data-tema="${tema}" data-type="tema">${nombreTema}</span>
         <div class="estructura-botones">
-          <button class="btn-mini-modal editar" title="Editar nombre" data-action="editar" data-unidad="${unidadSeleccionadaModal}" data-tema="${tema}">✏️</button>
           <button class="btn-mini-modal agregar" title="Agregar tema" data-action="agregar" data-unidad="${unidadSeleccionadaModal}">+</button>
           <button class="btn-mini-modal borrar" title="Borrar tema" data-action="borrar" data-unidad="${unidadSeleccionadaModal}" data-tema="${tema}">−</button>
         </div>
@@ -1083,6 +1094,63 @@ function renderEstructura() {
       }
     });
   });
+  
+  // Agregar listeners a nombres editables (unidades)
+  document.querySelectorAll('#listaUnidades .estructura-nombre').forEach(span => {
+    span.addEventListener('click', (e) => {
+      e.stopPropagation();
+      span.contentEditable = 'true';
+      span.focus();
+    });
+    
+    span.addEventListener('blur', () => {
+      span.contentEditable = 'false';
+      const unidad = span.dataset.unidad;
+      const nuevoNombre = span.textContent.trim();
+      if (nuevoNombre && state.datos[unidad]) {
+        state.datos[unidad]._nombre = nuevoNombre;
+        saveToStorage();
+        actualizarSelectorUnidades();
+      }
+    });
+    
+    span.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        span.blur();
+      }
+    });
+  });
+  
+  // Agregar listeners a nombres editables (temas)
+  document.querySelectorAll('#listaTemas .estructura-nombre').forEach(span => {
+    span.addEventListener('click', (e) => {
+      e.stopPropagation();
+      span.contentEditable = 'true';
+      span.focus();
+    });
+    
+    span.addEventListener('blur', () => {
+      span.contentEditable = 'false';
+      const unidad = span.dataset.unidad;
+      const tema = span.dataset.tema;
+      const nuevoNombre = span.textContent.trim();
+      if (nuevoNombre && state.datos[unidad]?.[tema]) {
+        state.datos[unidad][tema]._nombre = nuevoNombre;
+        saveToStorage();
+        if (unidad === state.unidadActual) {
+          actualizarSelectorTemas();
+        }
+      }
+    });
+    
+    span.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        span.blur();
+      }
+    });
+  });
 }
 
 function editarNombreUnidad(unidad) {
@@ -1094,11 +1162,13 @@ function actualizarSelectorTemas() {
   const selTema = document.getElementById('selTema');
   selTema.innerHTML = '';
   if (state.datos[state.unidadActual]) {
-    const temasDisponibles = Object.keys(state.datos[state.unidadActual]);
+    const temasDisponibles = Object.keys(state.datos[state.unidadActual])
+      .filter(k => k !== '_nombre');  // Filtrar _nombre
     temasDisponibles.forEach(t => {
       const opt = document.createElement('option');
       opt.value = t;
-      opt.textContent = 'Tema ' + t;
+      const nombreGuardado = state.datos[state.unidadActual][t]?._nombre || ('Tema ' + t);
+      opt.textContent = nombreGuardado;
       selTema.appendChild(opt);
     });
     
@@ -1112,6 +1182,20 @@ function actualizarSelectorTemas() {
     
     selTema.value = state.temaActual;
   }
+}
+
+function actualizarSelectorUnidades() {
+  const selUnidad = document.getElementById('selUnidad');
+  selUnidad.innerHTML = '';
+  Object.keys(state.datos).forEach(u => {
+    const opt = document.createElement('option');
+    opt.value = u;
+    const nombreGuardado = state.datos[u]?._nombre || ('Unidad ' + u);
+    opt.textContent = nombreGuardado;
+    selUnidad.appendChild(opt);
+  });
+  selUnidad.value = state.unidadActual;
+  actualizarSelectorTemas();
 }
 
 function agregarUnidad() {
@@ -1183,7 +1267,8 @@ function borrarUnidad(unidad) {
   Object.keys(state.datos).forEach(u => {
     const opt = document.createElement('option');
     opt.value = u;
-    opt.textContent = 'Unidad ' + u;
+    const nombreGuardado = state.datos[u]?._nombre || ('Unidad ' + u);
+    opt.textContent = nombreGuardado;
     selUnidad.appendChild(opt);
   });
   selUnidad.value = state.unidadActual;
@@ -1204,10 +1289,15 @@ function editarNombreTema(unidad, tema) {
 function agregarTema(unidad) {
   if (!state.datos[unidad]) return;
   
-  const temasExistentes = Object.keys(state.datos[unidad]).map(Number);
+  const temasExistentes = Object.keys(state.datos[unidad])
+    .filter(k => k !== '_nombre')  // No contar _nombre
+    .map(Number);
   const nuevoTemaNum = Math.max(...temasExistentes, 0) + 1;
   
-  state.datos[unidad][nuevoTemaNum] = [];
+  state.datos[unidad][nuevoTemaNum] = {
+    _nombre: 'Tema ' + nuevoTemaNum,
+    tarjetas: []
+  };
   
   // Actualizar selector si es la unidad actual
   if (unidad === state.unidadActual) {
@@ -1306,7 +1396,7 @@ function toggleModoVoz() {
 // ===== ESTILOS DE CELDA =====
 function renderSelectorEstilos() {
   // Tamaños
-  const tamaños = [4, 6, 8, 10, 12];
+  const tamaños = [4, 6, 8, 10, 12, 14, 16, 18];
   const tamanoSelector = document.getElementById('tamanoSelector');
   tamanoSelector.innerHTML = '';
   
@@ -1366,32 +1456,59 @@ function renderSelectorEstilos() {
 function aplicarEstiloACelda(estilos) {
   if (!state.celdaSeleccionada) return;
   
-  const { tarjetaId, fila, col } = state.celdaSeleccionada;
+  const { tarjetaId, fila, col, esTitle } = state.celdaSeleccionada;
   const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
   
-  if (!tarjeta || !tarjeta.contenido[fila] || !tarjeta.contenido[fila][col]) return;
+  if (!tarjeta) return;
   
-  const cellData = tarjeta.contenido[fila][col];
-  
-  // Asegurar que es un objeto
-  if (typeof cellData !== 'object') {
-    tarjeta.contenido[fila][col] = {
-      texto: cellData || '',
-      fontSize: 8,
-      color: '#2A2A2A',
-      bold: false
-    };
-  }
-  
-  // Aplicar estilos
-  if (estilos.fontSize !== undefined) {
-    tarjeta.contenido[fila][col].fontSize = estilos.fontSize;
-  }
-  if (estilos.color !== undefined) {
-    tarjeta.contenido[fila][col].color = estilos.color;
-  }
-  if (estilos.bold === 'toggle') {
-    tarjeta.contenido[fila][col].bold = !tarjeta.contenido[fila][col].bold;
+  // Si es el título
+  if (esTitle) {
+    // Asegurar que es un objeto
+    if (typeof tarjeta.titulo !== 'object') {
+      tarjeta.titulo = {
+        texto: tarjeta.titulo || '',
+        fontSize: 10,
+        color: '#2A2A2A',
+        bold: false
+      };
+    }
+    
+    // Aplicar estilos
+    if (estilos.fontSize !== undefined) {
+      tarjeta.titulo.fontSize = estilos.fontSize;
+    }
+    if (estilos.color !== undefined) {
+      tarjeta.titulo.color = estilos.color;
+    }
+    if (estilos.bold === 'toggle') {
+      tarjeta.titulo.bold = !tarjeta.titulo.bold;
+    }
+  } else {
+    // Si es una celda normal
+    if (!tarjeta.contenido[fila] || !tarjeta.contenido[fila][col]) return;
+    
+    const cellData = tarjeta.contenido[fila][col];
+    
+    // Asegurar que es un objeto
+    if (typeof cellData !== 'object') {
+      tarjeta.contenido[fila][col] = {
+        texto: cellData || '',
+        fontSize: 8,
+        color: '#2A2A2A',
+        bold: false
+      };
+    }
+    
+    // Aplicar estilos
+    if (estilos.fontSize !== undefined) {
+      tarjeta.contenido[fila][col].fontSize = estilos.fontSize;
+    }
+    if (estilos.color !== undefined) {
+      tarjeta.contenido[fila][col].color = estilos.color;
+    }
+    if (estilos.bold === 'toggle') {
+      tarjeta.contenido[fila][col].bold = !tarjeta.contenido[fila][col].bold;
+    }
   }
   
   saveToStorage();
@@ -1503,7 +1620,12 @@ function addCard() {
     scale: 1,
     borde: 'borde-simple',
     cols: 2,
-    titulo: 'Nueva tarjeta',
+    titulo: {
+      texto: 'Nueva tarjeta',
+      fontSize: 10,
+      color: '#2A2A2A',
+      bold: false
+    },
     contenido: [
       [
         { texto: '', fontSize: 8, color: '#2A2A2A', bold: false },
@@ -1581,18 +1703,53 @@ function renderCards() {
     title.className = 'card-title';
     title.contentEditable = 'false';
     title.spellcheck = 'false';
-    title.textContent = card.titulo || 'Tarjeta ' + card.id;
+    
+    // Obtener datos del título (objeto o string por compatibilidad)
+    const titleData = card.titulo;
+    let titleTexto, titleFontSize, titleColor, titleBold;
+    
+    if (typeof titleData === 'object') {
+      titleTexto = titleData.texto || 'Nueva tarjeta';
+      titleFontSize = titleData.fontSize || 10;
+      titleColor = titleData.color || '#2A2A2A';
+      titleBold = titleData.bold || false;
+    } else {
+      // Compatibilidad con títulos viejos (string)
+      titleTexto = titleData || 'Tarjeta ' + card.id;
+      titleFontSize = 10;
+      titleColor = '#2A2A2A';
+      titleBold = false;
+    }
+    
+    // Aplicar estilos
+    title.style.fontSize = titleFontSize + 'px';
+    title.style.color = titleColor;
+    title.style.fontWeight = titleBold ? '700' : '400';
+    title.textContent = titleTexto;
     
     // Al clickear, pasar a editable
     title.addEventListener('click', (e) => {
       e.stopPropagation();
+      state.celdaSeleccionada = { tarjetaId: card.id, esTitle: true };
       title.contentEditable = 'true';
       title.focus();
+      // Mostrar sección de estilos
+      document.getElementById('seccionEstilosCelda').style.display = 'block';
+      renderSelectorEstilos();
     });
     
     title.addEventListener('blur', () => {
       title.contentEditable = 'false';
-      card.titulo = title.textContent;
+      // Guardar el objeto de título
+      if (typeof card.titulo !== 'object') {
+        card.titulo = {
+          texto: card.titulo || '',
+          fontSize: 10,
+          color: '#2A2A2A',
+          bold: false
+        };
+      }
+      card.titulo.texto = title.textContent;
       saveToStorage();
     });
     
@@ -1923,9 +2080,6 @@ function saveToStorage() {
 }
 
 function loadFromStorage() {
-  // Limpiar localStorage para resetear
-  localStorage.removeItem('cuaderno-state');
-  
   const saved = localStorage.getItem('cuaderno-state');
   if (saved) {
     state.datos = JSON.parse(saved);
