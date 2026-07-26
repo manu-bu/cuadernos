@@ -652,6 +652,8 @@ header {
   <div class="header-right">
     <button class="btn" id="btnEditarEstructura" title="Editar estructura">🌳</button>
     <button class="btn" id="btnEditarFondo" title="Editar fondo">🎨</button>
+    <button class="btn" id="btnDescargar" title="Descargar backup">💾</button>
+    <button class="btn" id="btnCargar" title="Cargar backup">📂</button>
     <button class="btn" id="btnAddCard" title="Agregar tarjeta">➕</button>
     <button class="btn" id="btnToggleEditor" title="Toggle editor">✏️</button>
   </div>
@@ -821,6 +823,8 @@ function setupEventListeners() {
   document.getElementById('btnToggleEditor').addEventListener('click', toggleEditor);
   document.getElementById('btnEditarEstructura').addEventListener('click', abrirModalEstructura);
   document.getElementById('btnEditarFondo').addEventListener('click', abrirModalFondo);
+  document.getElementById('btnDescargar').addEventListener('click', descargarBackup);
+  document.getElementById('btnCargar').addEventListener('click', cargarBackup);
   document.getElementById('btnCerrarModalFondo').addEventListener('click', cerrarModalFondo);
   document.getElementById('btnCerrarModal').addEventListener('click', cerrarModalEstructura);
   
@@ -1226,6 +1230,49 @@ function abrirModalFondo() {
 
 function cerrarModalFondo() {
   document.getElementById('modalFondo').classList.add('hidden');
+}
+
+// ===== DESCARGAR BACKUP =====
+function descargarBackup() {
+  const json = JSON.stringify(state.datos, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cuaderno-backup-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===== CARGAR BACKUP =====
+function cargarBackup() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const datos = JSON.parse(event.target.result);
+        state.datos = datos;
+        state.unidadActual = Object.keys(state.datos)[0] || 'A';
+        state.temaActual = Object.keys(state.datos[state.unidadActual])[0] || '1';
+        state.tarjetaSeleccionada = null;
+        saveToStorage();
+        actualizarSelectorUnidades();
+        actualizarSelectorTemas();
+        renderCards();
+        alert('✅ Backup cargado correctamente!');
+      } catch (error) {
+        alert('❌ Error al cargar el archivo: ' + error.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
 }
 
 function renderFondo() {
