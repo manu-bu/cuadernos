@@ -651,6 +651,7 @@ header {
   
   <div class="header-right">
     <button class="btn" id="btnEditarEstructura" title="Editar estructura">🌳</button>
+    <button class="btn" id="btnModoVoz" title="Modo Voz">🔊</button>
     <button class="btn" id="btnEditarFondo" title="Editar fondo">🎨</button>
     <button class="btn" id="btnDescargar" title="Descargar backup">💾</button>
     <button class="btn" id="btnCargar" title="Cargar backup">📂</button>
@@ -720,6 +721,24 @@ header {
       <span id="escalaLabel" style="font-size: 12px; font-weight: 600; color: #3a3a38; min-width: 30px; text-align: right;">100%</span>
     </div>
   </div>
+  
+  <div class="panel-section" id="seccionEstilosCelda" style="display: none;">
+    <div class="panel-label">Estilo de Celda</div>
+    
+    <div style="margin-bottom: 12px;">
+      <div style="font-size: 11px; font-weight: 600; color: #6a6a68; margin-bottom: 6px; text-transform: uppercase;">Tamaño</div>
+      <div id="tamanoSelector" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;"></div>
+    </div>
+    
+    <div style="margin-bottom: 12px;">
+      <div style="font-size: 11px; font-weight: 600; color: #6a6a68; margin-bottom: 6px; text-transform: uppercase;">Color</div>
+      <div id="colorTextoSelector" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;"></div>
+    </div>
+    
+    <div style="margin-bottom: 12px;">
+      <button id="btnToggleBold" class="panel-btn" style="width: 100%;">Bold / Normal</button>
+    </div>
+  </div>
 </div>
 
 <!-- ===== MODAL FONDO ===== -->
@@ -776,7 +795,9 @@ let state = {
   unidadActual: 'A',
   temaActual: '1',
   editorActivo: false,
+  modoVoz: false,
   tarjetaSeleccionada: null,
+  celdaSeleccionada: null, // { tarjetaId, fila, col }
   bordeSeleccionado: null,
   colsSeleccionadas: 1,
   aplicarA: 'una', // 'una' o 'todas'
@@ -825,6 +846,7 @@ function setupEventListeners() {
   document.getElementById('btnEditarFondo').addEventListener('click', abrirModalFondo);
   document.getElementById('btnDescargar').addEventListener('click', descargarBackup);
   document.getElementById('btnCargar').addEventListener('click', cargarBackup);
+  document.getElementById('btnModoVoz').addEventListener('click', toggleModoVoz);
   document.getElementById('btnCerrarModalFondo').addEventListener('click', cerrarModalFondo);
   document.getElementById('btnCerrarModal').addEventListener('click', cerrarModalEstructura);
   
@@ -1275,6 +1297,106 @@ function cargarBackup() {
   input.click();
 }
 
+// ===== MODO VOZ =====
+function toggleModoVoz() {
+  state.modoVoz = !state.modoVoz;
+  document.getElementById('btnModoVoz').classList.toggle('active', state.modoVoz);
+}
+
+// ===== ESTILOS DE CELDA =====
+function renderSelectorEstilos() {
+  // Tamaños
+  const tamaños = [4, 6, 8, 10, 12];
+  const tamanoSelector = document.getElementById('tamanoSelector');
+  tamanoSelector.innerHTML = '';
+  
+  tamaños.forEach(tam => {
+    const btn = document.createElement('button');
+    btn.textContent = tam;
+    btn.style.fontSize = '12px';
+    btn.style.padding = '8px 4px';
+    btn.style.borderRadius = '4px';
+    btn.style.border = '1px solid #d4d4d2';
+    btn.style.background = '#f5f5f3';
+    btn.style.cursor = 'pointer';
+    btn.style.transition = 'all 0.2s';
+    
+    btn.addEventListener('click', () => {
+      aplicarEstiloACelda({ fontSize: tam });
+      renderSelectorEstilos();
+      renderCards();
+    });
+    
+    tamanoSelector.appendChild(btn);
+  });
+  
+  // Colores
+  const colorTextoSelector = document.getElementById('colorTextoSelector');
+  colorTextoSelector.innerHTML = '';
+  
+  COLORES_TEXTO.forEach(col => {
+    const btn = document.createElement('button');
+    btn.style.width = '100%';
+    btn.style.height = '30px';
+    btn.style.borderRadius = '4px';
+    btn.style.border = '1px solid #d4d4d2';
+    btn.style.background = col.valor;
+    btn.style.cursor = 'pointer';
+    btn.style.transition = 'all 0.2s';
+    btn.title = col.nombre;
+    
+    btn.addEventListener('click', () => {
+      aplicarEstiloACelda({ color: col.valor });
+      renderSelectorEstilos();
+      renderCards();
+    });
+    
+    colorTextoSelector.appendChild(btn);
+  });
+  
+  // Bold toggle
+  const btnToggleBold = document.getElementById('btnToggleBold');
+  btnToggleBold.addEventListener('click', () => {
+    aplicarEstiloACelda({ bold: 'toggle' });
+    renderSelectorEstilos();
+    renderCards();
+  });
+}
+
+function aplicarEstiloACelda(estilos) {
+  if (!state.celdaSeleccionada) return;
+  
+  const { tarjetaId, fila, col } = state.celdaSeleccionada;
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
+  
+  if (!tarjeta || !tarjeta.contenido[fila] || !tarjeta.contenido[fila][col]) return;
+  
+  const cellData = tarjeta.contenido[fila][col];
+  
+  // Asegurar que es un objeto
+  if (typeof cellData !== 'object') {
+    tarjeta.contenido[fila][col] = {
+      texto: cellData || '',
+      fontSize: 8,
+      color: '#2A2A2A',
+      bold: false
+    };
+  }
+  
+  // Aplicar estilos
+  if (estilos.fontSize !== undefined) {
+    tarjeta.contenido[fila][col].fontSize = estilos.fontSize;
+  }
+  if (estilos.color !== undefined) {
+    tarjeta.contenido[fila][col].color = estilos.color;
+  }
+  if (estilos.bold === 'toggle') {
+    tarjeta.contenido[fila][col].bold = !tarjeta.contenido[fila][col].bold;
+  }
+  
+  saveToStorage();
+}
+
 function renderFondo() {
   const colores = [
     { name: 'Beige', value: '#f0ebe5' },
@@ -1383,8 +1505,14 @@ function addCard() {
     cols: 2,
     titulo: 'Nueva tarjeta',
     contenido: [
-      ['', ''],
-      ['', '']
+      [
+        { texto: '', fontSize: 8, color: '#2A2A2A', bold: false },
+        { texto: '', fontSize: 8, color: '#2A2A2A', bold: false }
+      ],
+      [
+        { texto: '', fontSize: 8, color: '#2A2A2A', bold: false },
+        { texto: '', fontSize: 8, color: '#2A2A2A', bold: false }
+      ]
     ]
   };
   tarjetas.push(newCard);
@@ -1488,23 +1616,51 @@ function renderCards() {
         cell.className = 'cell';
         cell.contentEditable = 'false';
         cell.spellcheck = 'false';
-        // Cargar innerHTML para mostrar <br>
-        cell.innerHTML = card.contenido[fila]?.[col] || '';
+        
+        // Obtener objeto de celda o crear uno por defecto
+        const cellData = card.contenido[fila]?.[col];
+        const texto = (typeof cellData === 'object') ? cellData.texto : (cellData || '');
+        const fontSize = (typeof cellData === 'object') ? cellData.fontSize : 8;
+        const color = (typeof cellData === 'object') ? cellData.color : '#2A2A2A';
+        const bold = (typeof cellData === 'object') ? cellData.bold : false;
+        
+        // Aplicar estilos a la celda
+        cell.style.fontSize = fontSize + 'px';
+        cell.style.color = color;
+        cell.style.fontWeight = bold ? '700' : '400';
+        
+        // Cargar HTML del texto
+        cell.innerHTML = texto;
         cell.dataset.fila = fila;
         cell.dataset.col = col;
         
-        // Al clickear, pasar a editable
+        // Al clickear, pasar a editable y trackear selección
         cell.addEventListener('click', (e) => {
           e.stopPropagation();
+          state.celdaSeleccionada = { tarjetaId: card.id, fila, col };
           cell.contentEditable = 'true';
           cell.focus();
+          // Mostrar sección de estilos
+          document.getElementById('seccionEstilosCelda').style.display = 'block';
+          renderSelectorEstilos();
         });
         
         cell.addEventListener('blur', () => {
           cell.contentEditable = 'false';
           if (!card.contenido[fila]) card.contenido[fila] = [];
-          // Guardar innerHTML para preservar <br>
-          card.contenido[fila][col] = cell.innerHTML;
+          
+          // Guardar solo el texto en el objeto, preservar estilos
+          if (typeof card.contenido[fila][col] === 'object') {
+            card.contenido[fila][col].texto = cell.innerHTML;
+          } else {
+            // Convertir a objeto si aún es string (por compatibilidad)
+            card.contenido[fila][col] = {
+              texto: cell.innerHTML,
+              fontSize: 8,
+              color: '#2A2A2A',
+              bold: false
+            };
+          }
           saveToStorage();
         });
         
@@ -1874,6 +2030,33 @@ class ParticleSystem {
 
 // Variables de partículas
 let particleSystem = null;
+
+// Paleta de colores para texto
+const COLORES_TEXTO = [
+  { nombre: 'Rojo', valor: '#E63946' },
+  { nombre: 'Amarillo', valor: '#FFC93C' },
+  { nombre: 'Negro', valor: '#2A2A2A' },
+  { nombre: 'Verde', valor: '#6FCF3D' },
+  { nombre: 'Turquesa', valor: '#17B8CE' },
+  { nombre: 'Naranja', valor: '#F0932F' },
+  { nombre: 'Rosa', valor: '#E89CB8' },
+  { nombre: 'Fuxia', valor: '#FF4D9F' },
+  { nombre: 'Violeta', valor: '#8557D4' },
+  { nombre: 'Lavanda', valor: '#CCB0E3' },
+  { nombre: 'Aqua', valor: '#4A9FB5' },
+  { nombre: 'Celeste', valor: '#B8E3F0' },
+  { nombre: 'Gris', valor: '#6B6B63' },
+  { nombre: 'Piedra', valor: '#8B7B6F' },
+  { nombre: 'Dorado', valor: '#B8860B' },
+  { nombre: 'Arena', valor: '#C9A961' },
+  { nombre: 'Marrón', valor: '#6B4423' },
+  { nombre: 'Verde Oscuro', valor: '#1B4D3E' },
+  { nombre: 'Musgo', valor: '#556B2F' },
+  { nombre: 'Menta', valor: '#9ADEC9' },
+  { nombre: 'Azul', valor: '#1E3A8A' },
+  { nombre: 'Bordeaux', valor: '#5C1E1E' },
+  { nombre: 'Blanco', valor: '#FAFAFA' }
+];
 
 // ===== START =====
 init();
