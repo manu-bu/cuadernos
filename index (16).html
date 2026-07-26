@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1366, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Cuaderno</title>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --w: 1366px;
+  --h: 100dvh;
+  --header-h: 72px;
+  
+  --bg-app: #f0ebe5;
+  --header-bg: #e9e9e7;
+  --border-header: #d4d4d2;
+  
+  --sel-h: 44px;
+  --sel-radius: 22px;
+  --sel-border: 3.5px;
+  --sel-color: #9a9a98;
+  
+  --card-radius: 16px;
+  --card-padding: 16px;
+  --card-border-w: 3.5px;
+  --card-bg: #ffffff;
+  
+  --font: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+html, body {
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg-app);
+  font-family: var(--font);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* ===== HEADER / BARRA DE HERRAMIENTAS ===== */
+header {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: var(--header-h);
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border-header);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  gap: 20px;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.selector {
+  height: var(--sel-h);
+  border-radius: var(--sel-radius);
+  border: var(--sel-border) solid #c8c8c6;
+  background: #ffffff;
+  padding: 0 16px;
+  font-size: 14px;
+  color: var(--sel-color);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.selector:hover {
+  border-color: #a8a8a6;
+}
+
+.selector.active {
+  color: #2a2a28;
+  border-color: #888886;
+  background: #f9f9f7;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: var(--sel-border) solid #b8b8b6;
+  background: #ffffff;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.btn:hover {
+  border-color: #888886;
+  background: #f9f9f7;
+}
+
+.btn.active {
+  border-color: #88cc00;
+  background: #f0ff80;
+  box-shadow: 0 0 8px rgba(136, 204, 0, 0.4);
+}
+
+/* ===== EDITOR BORDES ===== */
+.editor-bordes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border-left: 1px solid var(--border-header);
+}
+
+.borde-opcion {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 2px solid #d4d4d2;
+  background: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.15s;
+}
+
+.borde-opcion:hover {
+  border-color: #888886;
+}
+
+.borde-opcion.active {
+  border-color: #88cc00;
+  background: #f0ff80;
+  box-shadow: 0 0 8px rgba(136, 204, 0, 0.4);
+}
+
+/* ===== MESA / VIEWPORT ===== */
+#mesa {
+  position: absolute;
+  top: var(--header-h);
+  left: 0;
+  width: 100%;
+  height: calc(100dvh - var(--header-h));
+  background: var(--bg-app);
+  overflow: hidden;
+  touch-action: none;
+  perspective: 1000px;
+}
+
+/* ===== TARJETAS ===== */
+.card {
+  position: absolute;
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  padding: 16px 8px 8px 8px;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  
+  /* Default: borde simple gris */
+  border: var(--card-border-w) solid #d4d4d2;
+  
+  /* Sombra sutil */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  
+  transition: box-shadow 0.1s, transform 0.1s;
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.card.selected {
+  box-shadow: 0 0 12px rgba(136, 204, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* Tipos de bordes predefinidos */
+.card.borde-simple {
+  border: var(--card-border-w) solid #d4d4d2;
+}
+
+.card.borde-punteado {
+  border: var(--card-border-w) dashed #8a8a88;
+}
+
+.card.borde-doble {
+  border: var(--card-border-w) double #b8b8b6;
+}
+
+.card.borde-grosor {
+  border: 6px solid #6b6b69;
+}
+
+.card.borde-color-a {
+  border: var(--card-border-w) solid #C85A54;
+}
+
+.card.borde-color-b {
+  border: var(--card-border-w) solid #1E3A8A;
+}
+
+.card.borde-color-c {
+  border: var(--card-border-w) solid #6FCF3D;
+}
+
+.card.borde-terreno {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #8B7B6F, #D9CFC4) border-box;
+}
+
+.card.borde-flora {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #6FCF3D, #C5EBA8) border-box;
+}
+
+.card.borde-verano {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #f0d878, #f5e6b0) border-box;
+}
+
+.card.borde-clima {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from 0deg, #ffffff 0deg, #b0b0ae 75deg, #8ec6e0 190deg, #f0d878 280deg, #f0a8c0 320deg, #ffffff 360deg) border-box;
+}
+
+.card.borde-terreno {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #8B7B6F, #D9CFC4) border-box;
+}
+
+.card.borde-flora {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #6FCF3D, #C5EBA8) border-box;
+}
+
+.card.borde-verano {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #f0d878, #f5e6b0) border-box;
+}
+
+.card.borde-clima {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from 0deg, #ffffff 0deg, #b0b0ae 75deg, #8ec6e0 190deg, #f0d878 280deg, #f0a8c0 320deg, #ffffff 360deg) border-box;
+}
+
+/* Contenedor de columnas */
+.card-grid {
+  display: grid;
+  gap: 0px 4px;
+  width: 100%;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2a2a28;
+  margin-bottom: 8px;
+  margin-top: -8px;
+  padding: 0px 6px 6px 6px;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 0.5px solid #d0d0ce;
+  transition: all 0.15s;
+  cursor: text;
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.card-title:hover {
+  background: transparent;
+  border-bottom-color: #888886;
+}
+
+.card-title:focus {
+  outline: none;
+  background: transparent;
+  border-bottom-color: #88cc00;
+}
+
+.card-title[contenteditable="true"] {
+  background: transparent;
+  border-bottom-color: #88cc00;
+}
+
+.cell {
+  background: transparent;
+  border: none;
+  border-bottom: 0.5px solid #d0d0ce;
+  border-radius: 0;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #2a2a28;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  word-break: break-word;
+  cursor: text;
+  transition: all 0.15s;
+  white-space: pre-wrap;
+}
+
+.cell:hover {
+  background: transparent;
+  border-bottom-color: #b8b8b6;
+}
+
+.cell:focus {
+  outline: none;
+  background: #fafaf8;
+  border-bottom-color: #88cc00;
+  box-shadow: 0 0 6px rgba(136, 204, 0, 0.2);
+}
+
+.cell[contenteditable="true"] {
+  background: #fafaf8;
+  border-bottom-color: #88cc00;
+  padding: 4px 6px;
+}
+
+.card-grid {
+  display: grid;
+  gap: 0px 4px;
+  width: 100%;
+  grid-auto-columns: auto;
+}
+
+.cell-wrapper {
+  display: contents;
+}
+
+.row-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  font-size: 10px;
+  padding: 4px;
+}
+
+.row-actions button {
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 0.5px solid #d4d4d2;
+  background: #ffffff;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.row-actions button:hover {
+  border-color: #888886;
+  background: #f0f0ee;
+}
+
+
+
+/* ===== MODAL EDITAR ESTRUCTURA ===== */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+  padding: 20px;
+  border-bottom: 1px solid #e0e0de;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2a2a28;
+}
+
+.btn-cerrar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: #f0f0ee;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-cerrar:hover {
+  background: #e0e0de;
+}
+
+.modal-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  gap: 0;
+}
+
+.modal-col {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  border-right: 1px solid #e0e0de;
+}
+
+.modal-col:last-child {
+  border-right: none;
+}
+
+.modal-col h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #6a6a68;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+.estructura-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.estructura-item {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #e0e0de;
+  background: #fafaf8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 13px;
+}
+
+.estructura-item:hover {
+  background: #f0f0ee;
+  border-color: #d0d0ce;
+}
+
+.estructura-item.seleccionado {
+  background: #e6f0ff;
+  border-color: #1E3A8A;
+  color: #1E3A8A;
+  font-weight: 600;
+}
+
+.estructura-item.editable {
+  padding: 6px 8px;
+}
+
+.estructura-item input {
+  flex: 1;
+  border: 1px solid #88cc00;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #ffffff;
+}
+
+.estructura-nombre {
+  flex: 1;
+  margin-left: 8px;
+}
+
+.estructura-botones {
+  display: flex;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.btn-mini-modal {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 0.5px solid #d4d4d2;
+  background: #ffffff;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-mini-modal:hover {
+  background: #f0f0ee;
+  border-color: #888886;
+}
+
+.btn-mini-modal.editar {
+  color: #1E3A8A;
+}
+
+.btn-mini-modal.agregar {
+  color: #6FCF3D;
+}
+
+.btn-mini-modal.borrar {
+  color: #a32d2d;
+}
+
+/* ===== PANEL DERECHO (EDITOR DETALLES) ===== */
+.panel-derecho {
+  position: fixed;
+  right: 0;
+  top: var(--header-h);
+  width: 280px;
+  height: calc(100dvh - var(--header-h));
+  background: #f9f9f7;
+  border-left: 1px solid var(--border-header);
+  padding: 16px;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.panel-derecho.hidden {
+  display: none;
+}
+
+.panel-section {
+  margin-bottom: 20px;
+}
+
+.panel-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6a6a68;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.panel-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.panel-btn {
+  flex: 1;
+  min-width: 60px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #d4d4d2;
+  background: #ffffff;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.panel-btn:hover {
+  border-color: #888886;
+  background: #f0f0ee;
+}
+
+.panel-btn.active {
+  border-color: #88cc00;
+  background: #f0ff80;
+  color: #3a3a38;
+  font-weight: 600;
+}
+
+</style>
+
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="header-left">
+    <select id="selUnidad" class="selector">
+      <option value="A">Unidad A</option>
+    </select>
+    
+    <select id="selTema" class="selector">
+      <option value="1">Tema 1</option>
+    </select>
+  </div>
+  
+  <div class="header-right">
+    <button class="btn" id="btnEditarEstructura" title="Editar estructura">🌳</button>
+    <button class="btn" id="btnEditarFondo" title="Editar fondo">🎨</button>
+    <button class="btn" id="btnDescargar" title="Descargar backup">💾</button>
+    <button class="btn" id="btnCargar" title="Cargar backup">📂</button>
+    <button class="btn" id="btnAddCard" title="Agregar tarjeta">➕</button>
+    <button class="btn" id="btnToggleEditor" title="Toggle editor">✏️</button>
+  </div>
+</header>
+
+<!-- ===== PANEL EDITOR (DERECHA) ===== -->
+<div class="panel-derecho hidden" id="panelEditor">
+  <div class="panel-section">
+    <div class="panel-label">Bordes</div>
+    <div class="panel-buttons">
+      <button class="panel-btn" data-borde="borde-simple">Simple</button>
+      <button class="panel-btn" data-borde="borde-punteado">Punteado</button>
+      <button class="panel-btn" data-borde="borde-doble">Doble</button>
+      <button class="panel-btn" data-borde="borde-grosor">Grueso</button>
+    </div>
+    <div class="panel-label" style="margin-top: 12px;">Colores</div>
+    <div class="panel-buttons">
+      <button class="panel-btn" data-borde="borde-color-a">Rojo</button>
+      <button class="panel-btn" data-borde="borde-color-b">Azul</button>
+      <button class="panel-btn" data-borde="borde-color-c">Verde</button>
+    </div>
+    <div class="panel-label" style="margin-top: 12px;">Gradientes</div>
+    <div class="panel-buttons">
+      <button class="panel-btn" data-borde="borde-clima">Clima</button>
+      <button class="panel-btn" data-borde="borde-terreno">Terreno</button>
+      <button class="panel-btn" data-borde="borde-flora">Flora</button>
+    </div>
+  </div>
+  
+  <div class="panel-section">
+    <div class="panel-label">Aplicar a</div>
+    <div class="panel-buttons">
+      <button class="panel-btn" id="btnAplicarUna">Esta tarjeta</button>
+      <button class="panel-btn" id="btnAplicarTodas">Todas en tema</button>
+    </div>
+  </div>
+  
+  <div class="panel-section" id="seccionGridAbierta" style="display: none;">
+    <div class="panel-label">Filas y Columnas</div>
+    <div class="panel-buttons">
+      <button class="panel-btn" id="btnAddRow">+ Fila</button>
+      <button class="panel-btn" id="btnDelRow">- Fila</button>
+      <button class="panel-btn" id="btnAddCol">+ Columna</button>
+      <button class="panel-btn" id="btnDelCol">- Columna</button>
+    </div>
+  </div>
+  
+  <div class="panel-section" id="seccionBorrar" style="display: none;">
+    <button class="panel-btn" id="btnBorrarTarjeta" style="width: 100%; background: #ffe6e6; border-color: #e24b4a; color: #a32d2d;">Borrar tarjeta</button>
+  </div>
+  
+  <div class="panel-section" id="seccionConfirmar" style="display: none;">
+    <div style="font-size: 12px; color: #6a6a68; margin-bottom: 8px; text-align: center;">¿Estás seguro?</div>
+    <div class="panel-buttons">
+      <button class="panel-btn" id="btnConfirmarBorrar" style="background: #ffe6e6; border-color: #e24b4a; color: #a32d2d;">Sí, borrar</button>
+      <button class="panel-btn" id="btnCancelarBorrar" style="background: #e6f0ff; border-color: #1E3A8A; color: #1E3A8A;">Cancelar</button>
+    </div>
+  </div>
+  
+  <div class="panel-section" id="seccionEscala" style="display: none;">
+    <div class="panel-label">Escala</div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <input type="range" id="sliderEscala" min="0.5" max="2.5" step="0.1" value="1" style="flex: 1; height: 6px; border-radius: 3px; outline: none; accent-color: #88cc00;">
+      <span id="escalaLabel" style="font-size: 12px; font-weight: 600; color: #3a3a38; min-width: 30px; text-align: right;">100%</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL FONDO ===== -->
+<div id="modalFondo" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Personalizar Tema</h2>
+      <button id="btnCerrarModalFondo" class="btn-cerrar">✕</button>
+    </div>
+    <div style="padding: 20px;">
+      <h3 style="font-size: 14px; font-weight: 600; color: #6a6a68; margin-bottom: 12px; text-transform: uppercase;">Color de Fondo</h3>
+      <div id="fondoSelector" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px;"></div>
+      
+      <h3 style="font-size: 14px; font-weight: 600; color: #6a6a68; margin-bottom: 12px; text-transform: uppercase;">Partículas</h3>
+      <div id="particulasSelector" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MESA (VIEWPORT) ===== -->
+<div id="mesa"></div>
+
+<!-- ===== MODAL EDITAR ESTRUCTURA ===== -->
+<div id="modalEstructura" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Editar Estructura</h2>
+      <button id="btnCerrarModal" class="btn-cerrar">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-col">
+        <h3>Unidades</h3>
+        <div id="listaUnidades" class="estructura-lista"></div>
+      </div>
+      <div class="modal-col">
+        <h3>Temas</h3>
+        <div id="listaTemas" class="estructura-lista"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== CONFIG =====
+const UNIDADES = ['A'];
+const TEMAS_POR_UNIDAD = 1;
+const BORDER_STYLES = [
+  'borde-simple', 'borde-punteado', 'borde-doble', 'borde-grosor',
+  'borde-color-a', 'borde-color-b', 'borde-color-c', 'borde-gradient'
+];
+
+// ===== STATE =====
+let state = {
+  unidadActual: 'A',
+  temaActual: '1',
+  editorActivo: false,
+  tarjetaSeleccionada: null,
+  bordeSeleccionado: null,
+  colsSeleccionadas: 1,
+  aplicarA: 'una', // 'una' o 'todas'
+  
+  // Datos: { [unidad]: { [tema]: [ { id, x, y, scale, borde, cols, contenido: [[], [], ...] } ] } }
+  datos: {}
+};
+
+// ===== INIT =====
+function init() {
+  initData();
+  renderCards();
+  setupEventListeners();
+}
+
+function initData() {
+  UNIDADES.forEach(u => {
+    state.datos[u] = {};
+    for (let i = 1; i <= TEMAS_POR_UNIDAD; i++) {
+      state.datos[u][i] = [];
+    }
+  });
+  loadFromStorage();
+}
+
+function setupEventListeners() {
+  // Selectores
+  document.getElementById('selUnidad').addEventListener('change', (e) => {
+    state.unidadActual = e.target.value;
+    state.temaActual = Object.keys(state.datos[state.unidadActual])[0]; // Ir al primer tema de la nueva unidad
+    state.tarjetaSeleccionada = null;
+    actualizarSelectorTemas();
+    renderCards();
+  });
+  
+  document.getElementById('selTema').addEventListener('change', (e) => {
+    state.temaActual = e.target.value;
+    state.tarjetaSeleccionada = null;
+    renderCards();
+  });
+  
+  // Botones
+  document.getElementById('btnAddCard').addEventListener('click', addCard);
+  document.getElementById('btnToggleEditor').addEventListener('click', toggleEditor);
+  document.getElementById('btnEditarEstructura').addEventListener('click', abrirModalEstructura);
+  document.getElementById('btnEditarFondo').addEventListener('click', abrirModalFondo);
+  document.getElementById('btnDescargar').addEventListener('click', descargarBackup);
+  document.getElementById('btnCargar').addEventListener('click', cargarBackup);
+  document.getElementById('btnCerrarModalFondo').addEventListener('click', cerrarModalFondo);
+  document.getElementById('btnCerrarModal').addEventListener('click', cerrarModalEstructura);
+  
+  // Panel editor - bordes
+  document.querySelectorAll('[data-borde]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      state.bordeSeleccionado = e.target.dataset.borde;
+      updateBordeButtons();
+      // Aplicar inmediatamente
+      if (state.tarjetaSeleccionada) {
+        aplicarBorde();
+      }
+    });
+  });
+  
+  // Panel editor - filas y columnas
+  document.getElementById('btnAddRow').addEventListener('click', () => {
+    if (!state.tarjetaSeleccionada) return;
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
+    if (card) {
+      card.contenido.push(new Array(card.cols).fill(''));
+      renderCards();
+      saveToStorage();
+    }
+  });
+  
+  document.getElementById('btnDelRow').addEventListener('click', () => {
+    if (!state.tarjetaSeleccionada) return;
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
+    if (card && card.contenido.length > 1) {
+      card.contenido.pop();
+      renderCards();
+      saveToStorage();
+    }
+  });
+  
+  document.getElementById('btnAddCol').addEventListener('click', () => {
+    if (!state.tarjetaSeleccionada) return;
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
+    if (card) {
+      card.cols++;
+      card.contenido.forEach(row => row.push(''));
+      renderCards();
+      saveToStorage();
+    }
+  });
+  
+  document.getElementById('btnDelCol').addEventListener('click', () => {
+    if (!state.tarjetaSeleccionada) return;
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
+    if (card && card.cols > 1) {
+      card.cols--;
+      card.contenido.forEach(row => row.pop());
+      renderCards();
+      saveToStorage();
+    }
+  });
+  
+  document.getElementById('btnBorrarTarjeta').addEventListener('click', () => {
+    document.getElementById('seccionBorrar').style.display = 'none';
+    document.getElementById('seccionConfirmar').style.display = 'block';
+  });
+  
+  document.getElementById('btnConfirmarBorrar').addEventListener('click', () => {
+    if (!state.tarjetaSeleccionada) return;
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const idx = tarjetas.findIndex(c => c.id === state.tarjetaSeleccionada);
+    if (idx !== -1) {
+      tarjetas.splice(idx, 1);
+      state.tarjetaSeleccionada = null;
+      document.getElementById('seccionGridAbierta').style.display = 'none';
+      document.getElementById('seccionBorrar').style.display = 'none';
+      document.getElementById('seccionConfirmar').style.display = 'none';
+      document.getElementById('seccionEscala').style.display = 'none';
+      renderCards();
+      saveToStorage();
+    }
+  });
+  
+  document.getElementById('btnCancelarBorrar').addEventListener('click', () => {
+    document.getElementById('seccionConfirmar').style.display = 'none';
+    document.getElementById('seccionBorrar').style.display = 'block';
+  });
+  
+  // Slider de escala
+  document.getElementById('sliderEscala').addEventListener('input', (e) => {
+    if (!state.tarjetaSeleccionada) return;
+    const escala = parseFloat(e.target.value);
+    const porcentaje = Math.round(escala * 100);
+    document.getElementById('escalaLabel').textContent = porcentaje + '%';
+    
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
+    if (card) {
+      card.scale = escala;
+      renderCards();
+    }
+  });
+  
+  document.getElementById('sliderEscala').addEventListener('change', () => {
+    saveToStorage();
+  });
+  
+  // Panel editor - aplicar a
+  document.getElementById('btnAplicarUna').addEventListener('click', () => {
+    state.aplicarA = 'una';
+    updateAplicarButtons();
+  });
+  
+  document.getElementById('btnAplicarTodas').addEventListener('click', () => {
+    state.aplicarA = 'todas';
+    updateAplicarButtons();
+  });
+  
+  // Mesa - pointer events
+  const mesa = document.getElementById('mesa');
+  mesa.addEventListener('pointerdown', onPointerDown);
+  mesa.addEventListener('click', (e) => {
+    // Si clickeás en la mesa directamente (no en una tarjeta), deselecciona
+    if (e.target === mesa) {
+      state.tarjetaSeleccionada = null;
+      document.getElementById('seccionGridAbierta').style.display = 'none';
+      document.getElementById('seccionBorrar').style.display = 'none';
+      renderCards();
+    }
+  });
+  document.addEventListener('pointermove', onPointerMove);
+  document.addEventListener('pointerup', onPointerUp);
+  document.addEventListener('pointercancel', onPointerUp);
+}
+
+// ===== MODAL EDITAR ESTRUCTURA =====
+let unidadSeleccionadaModal = null;
+
+function abrirModalEstructura() {
+  document.getElementById('modalEstructura').classList.remove('hidden');
+  unidadSeleccionadaModal = state.unidadActual;
+  renderEstructura();
+}
+
+function cerrarModalEstructura() {
+  document.getElementById('modalEstructura').classList.add('hidden');
+}
+
+function renderEstructura() {
+  // Renderizar unidades
+  const listaUnidades = document.getElementById('listaUnidades');
+  listaUnidades.innerHTML = '';
+  
+  const unidadesKeys = Object.keys(state.datos);
+  unidadesKeys.forEach((unidad, idx) => {
+    const item = document.createElement('div');
+    item.className = `estructura-item ${unidad === unidadSeleccionadaModal ? 'seleccionado' : ''}`;
+    item.dataset.unidad = unidad;
+    
+    item.innerHTML = `
+      <span class="estructura-nombre">${'Unidad ' + unidad}</span>
+      <div class="estructura-botones">
+        <button class="btn-mini-modal editar" title="Editar nombre" data-action="editar" data-unidad="${unidad}">✏️</button>
+        <button class="btn-mini-modal agregar" title="Agregar unidad" data-action="agregarUnidad" data-unidad="${unidad}">+</button>
+        <button class="btn-mini-modal borrar" title="Borrar unidad" data-action="borrar" data-unidad="${unidad}">−</button>
+      </div>
+    `;
+    
+    item.addEventListener('click', (e) => {
+      if (!e.target.closest('.btn-mini-modal')) {
+        unidadSeleccionadaModal = unidad;
+        renderEstructura();
+      }
+    });
+    
+    listaUnidades.appendChild(item);
+  });
+  
+  // Renderizar temas de la unidad seleccionada
+  const listaTemas = document.getElementById('listaTemas');
+  listaTemas.innerHTML = '';
+  
+  if (unidadSeleccionadaModal && state.datos[unidadSeleccionadaModal]) {
+    const temasKeys = Object.keys(state.datos[unidadSeleccionadaModal]);
+    temasKeys.forEach((tema, idx) => {
+      const item = document.createElement('div');
+      item.className = 'estructura-item';
+      item.dataset.tema = tema;
+      
+      item.innerHTML = `
+        <span class="estructura-nombre">Tema ${tema}</span>
+        <div class="estructura-botones">
+          <button class="btn-mini-modal editar" title="Editar nombre" data-action="editar" data-unidad="${unidadSeleccionadaModal}" data-tema="${tema}">✏️</button>
+          <button class="btn-mini-modal agregar" title="Agregar tema" data-action="agregar" data-unidad="${unidadSeleccionadaModal}">+</button>
+          <button class="btn-mini-modal borrar" title="Borrar tema" data-action="borrar" data-unidad="${unidadSeleccionadaModal}" data-tema="${tema}">−</button>
+        </div>
+      `;
+      
+      listaTemas.appendChild(item);
+    });
+  }
+  
+  // Agregar listeners a botones de unidades
+  document.querySelectorAll('#listaUnidades .btn-mini-modal').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const action = btn.dataset.action;
+      const unidad = btn.dataset.unidad;
+      
+      if (action === 'editar') {
+        editarNombreUnidad(unidad);
+      } else if (action === 'agregarUnidad') {
+        agregarUnidad();
+      } else if (action === 'borrar') {
+        borrarUnidad(unidad);
+      }
+    });
+  });
+  
+  // Agregar listeners a botones de temas
+  document.querySelectorAll('#listaTemas .btn-mini-modal').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const action = btn.dataset.action;
+      const unidad = btn.dataset.unidad;
+      const tema = btn.dataset.tema;
+      
+      if (action === 'editar') {
+        editarNombreTema(unidad, tema);
+      } else if (action === 'agregar') {
+        agregarTema(unidad);
+      } else if (action === 'borrar') {
+        borrarTema(unidad, tema);
+      }
+    });
+  });
+}
+
+function editarNombreUnidad(unidad) {
+  console.log('Editar unidad:', unidad);
+  // TODO: implementar
+}
+
+function actualizarSelectorTemas() {
+  const selTema = document.getElementById('selTema');
+  selTema.innerHTML = '';
+  if (state.datos[state.unidadActual]) {
+    const temasDisponibles = Object.keys(state.datos[state.unidadActual]);
+    temasDisponibles.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t;
+      opt.textContent = 'Tema ' + t;
+      selTema.appendChild(opt);
+    });
+    
+    // Convertir temaActual a string para comparar correctamente
+    state.temaActual = String(state.temaActual);
+    
+    // Si el tema actual no existe, usar el primero disponible
+    if (!temasDisponibles.includes(state.temaActual)) {
+      state.temaActual = temasDisponibles[0];
+    }
+    
+    selTema.value = state.temaActual;
+  }
+}
+
+function agregarUnidad() {
+  // Generar letra para nueva unidad
+  const unidadesExistentes = Object.keys(state.datos);
+  let letraActual = unidadesExistentes.length > 0 
+    ? unidadesExistentes[unidadesExistentes.length - 1].charCodeAt(0) + 1 
+    : 65; // 65 = 'A'
+  const letraNueva = String.fromCharCode(letraActual);
+  
+  // Crear nueva unidad con 1 tema
+  state.datos[letraNueva] = {};
+  state.datos[letraNueva][1] = [];
+  
+  // Actualizar selector de unidades
+  const selUnidad = document.getElementById('selUnidad');
+  const option = document.createElement('option');
+  option.value = letraNueva;
+  option.textContent = 'Unidad ' + letraNueva;
+  selUnidad.appendChild(option);
+  
+  // Cambiar a la nueva unidad
+  state.unidadActual = letraNueva;
+  state.temaActual = '1';
+  selUnidad.value = letraNueva;
+  
+  actualizarSelectorTemas();
+  
+  saveToStorage();
+  renderCards();
+  renderEstructura();
+}
+
+function agregarTemaEnUnidad(unidad) {
+  if (!state.datos[unidad]) return;
+  
+  const temasExistentes = Object.keys(state.datos[unidad]).map(Number);
+  const nuevoTemaNum = Math.max(...temasExistentes, 0) + 1;
+  
+  state.datos[unidad][nuevoTemaNum] = [];
+  
+  // Actualizar selector si es la unidad actual
+  if (unidad === state.unidadActual) {
+    actualizarSelectorTemas();
+  }
+  
+  saveToStorage();
+  renderEstructura();
+}
+
+function borrarUnidad(unidad) {
+  if (Object.keys(state.datos).length <= 1) {
+    alert('No puedes borrar la última unidad');
+    return;
+  }
+  
+  delete state.datos[unidad];
+  
+  if (state.unidadActual === unidad) {
+    state.unidadActual = Object.keys(state.datos)[0];
+    state.temaActual = Object.keys(state.datos[state.unidadActual])[0];
+  }
+  
+  unidadSeleccionadaModal = state.unidadActual;
+  
+  // Actualizar selectors en header
+  const selUnidad = document.getElementById('selUnidad');
+  selUnidad.innerHTML = '';
+  Object.keys(state.datos).forEach(u => {
+    const opt = document.createElement('option');
+    opt.value = u;
+    opt.textContent = 'Unidad ' + u;
+    selUnidad.appendChild(opt);
+  });
+  selUnidad.value = state.unidadActual;
+  
+  // Actualizar temas
+  actualizarSelectorTemas();
+  
+  saveToStorage();
+  renderCards();
+  renderEstructura();
+}
+
+function editarNombreTema(unidad, tema) {
+  console.log('Editar tema:', unidad, tema);
+  // TODO: implementar
+}
+
+function agregarTema(unidad) {
+  if (!state.datos[unidad]) return;
+  
+  const temasExistentes = Object.keys(state.datos[unidad]).map(Number);
+  const nuevoTemaNum = Math.max(...temasExistentes, 0) + 1;
+  
+  state.datos[unidad][nuevoTemaNum] = [];
+  
+  // Actualizar selector si es la unidad actual
+  if (unidad === state.unidadActual) {
+    actualizarSelectorTemas();
+  }
+  
+  saveToStorage();
+  renderEstructura();
+}
+
+function borrarTema(unidad, tema) {
+  if (!state.datos[unidad]) return;
+  
+  if (Object.keys(state.datos[unidad]).length <= 1) {
+    alert('No puedes borrar el último tema');
+    return;
+  }
+  
+  delete state.datos[unidad][tema];
+  
+  // Si era el tema actual, cambiar al primero disponible
+  if (state.unidadActual === unidad && state.temaActual === tema) {
+    const temasRestantes = Object.keys(state.datos[unidad]);
+    state.temaActual = temasRestantes[0];
+  }
+  
+  // Actualizar selector si es la unidad actual
+  if (unidad === state.unidadActual) {
+    actualizarSelectorTemas();
+  }
+  
+  saveToStorage();
+  renderCards();
+  renderEstructura();
+}
+
+// ===== FONDO =====
+function abrirModalFondo() {
+  document.getElementById('modalFondo').classList.remove('hidden');
+  renderFondo();
+}
+
+function cerrarModalFondo() {
+  document.getElementById('modalFondo').classList.add('hidden');
+}
+
+// ===== DESCARGAR BACKUP =====
+function descargarBackup() {
+  const json = JSON.stringify(state.datos, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cuaderno-backup-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===== CARGAR BACKUP =====
+function cargarBackup() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const datos = JSON.parse(event.target.result);
+        state.datos = datos;
+        state.unidadActual = Object.keys(state.datos)[0] || 'A';
+        state.temaActual = Object.keys(state.datos[state.unidadActual])[0] || '1';
+        state.tarjetaSeleccionada = null;
+        saveToStorage();
+        actualizarSelectorUnidades();
+        actualizarSelectorTemas();
+        renderCards();
+        alert('✅ Backup cargado correctamente!');
+      } catch (error) {
+        alert('❌ Error al cargar el archivo: ' + error.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function renderFondo() {
+  const colores = [
+    { name: 'Beige', value: '#f0ebe5' },
+    { name: 'Gris claro', value: '#e9e9e7' },
+    { name: 'Blanco', value: '#ffffff' },
+    { name: 'Azul cielo', value: '#e6f0ff' },
+    { name: 'Verde menta', value: '#e6ffe6' },
+    { name: 'Rosa suave', value: '#ffe6f0' },
+    { name: 'Amarillo pastel', value: '#fffbe6' },
+    { name: 'Naranja suave', value: '#ffe6cc' },
+    { name: 'Gris oscuro', value: '#d0d0ce' },
+    { name: 'Azul oscuro', value: '#1e3a8a' }
+  ];
+  
+  const fondoSelector = document.getElementById('fondoSelector');
+  fondoSelector.innerHTML = '';
+  
+  colores.forEach(color => {
+    const btn = document.createElement('button');
+    btn.style.width = '100%';
+    btn.style.height = '50px';
+    btn.style.borderRadius = '4px';
+    btn.style.border = '1px solid #d4d4d2';
+    btn.style.background = color.value;
+    btn.style.cursor = 'pointer';
+    btn.style.transition = 'all 0.2s';
+    btn.title = color.name;
+    
+    btn.addEventListener('mouseenter', () => {
+      btn.style.border = '2px solid #000000';
+    });
+    
+    btn.addEventListener('mouseleave', () => {
+      btn.style.border = '1px solid #d4d4d2';
+    });
+    
+    btn.addEventListener('click', () => {
+      state.datos[state.unidadActual][state.temaActual].fondo = color.value;
+      saveToStorage();
+      renderCards();
+      cerrarModalFondo();
+    });
+    
+    fondoSelector.appendChild(btn);
+  });
+  renderParticulas();
+}
+
+function renderParticulas() {
+  const particulas = [
+    { name: 'Ninguna', value: null, colors: null },
+    { name: 'Blanca', value: 'blanca', colors: ['#FAFAFA', '#FAFAFA'] },
+    { name: 'Roja', value: 'roja', colors: ['#C85A54', '#E8B8B8'] },
+    { name: 'Amarilla', value: 'amarilla', colors: ['#f0d878', '#F5E6B0'] },
+    { name: 'Verde', value: 'verde', colors: ['#88cc00', '#D1FF9A'] },
+    { name: 'Azul', value: 'azul', colors: ['#1E3A8A', '#8AB4F8'] }
+  ];
+  
+  const particulasSelector = document.getElementById('particulasSelector');
+  particulasSelector.innerHTML = '';
+  
+  particulas.forEach(part => {
+    const btn = document.createElement('button');
+    btn.style.width = '100%';
+    btn.style.height = '50px';
+    btn.style.borderRadius = '4px';
+    btn.style.border = '1px solid #d4d4d2';
+    btn.style.background = '#f5f5f3';
+    btn.style.cursor = 'pointer';
+    btn.style.transition = 'all 0.2s';
+    btn.style.fontWeight = '600';
+    btn.style.fontSize = '13px';
+    btn.style.color = '#3a3a38';
+    btn.textContent = part.name;
+    
+    btn.addEventListener('mouseenter', () => {
+      btn.style.border = '2px solid #000000';
+      btn.style.backgroundColor = '#eeeeec';
+    });
+    
+    btn.addEventListener('mouseleave', () => {
+      btn.style.border = '1px solid #d4d4d2';
+      btn.style.backgroundColor = '#f5f5f3';
+    });
+    
+    btn.addEventListener('click', () => {
+      state.datos[state.unidadActual][state.temaActual].particula = part.value;
+      saveToStorage();
+      renderCards();
+    });
+    
+    particulasSelector.appendChild(btn);
+  });
+}
+
+// ===== AGREGAR TARJETA =====
+function addCard() {
+  const tarjetas = state.datos[state.unidadActual][state.temaActual];
+  const id = Date.now();
+  const newCard = {
+    id,
+    x: 50 + Math.random() * 200,
+    y: 100 + Math.random() * 200,
+    scale: 1,
+    borde: 'borde-simple',
+    cols: 2,
+    titulo: 'Nueva tarjeta',
+    contenido: [
+      ['', ''],
+      ['', '']
+    ]
+  };
+  tarjetas.push(newCard);
+  selectCard(id);
+  renderCards();
+  saveToStorage();
+}
+
+// ===== RENDERIZAR =====
+function renderCards() {
+  const mesa = document.getElementById('mesa');
+  mesa.innerHTML = '';
+  
+  // Aplicar fondo del tema
+  const tema = state.datos[state.unidadActual][state.temaActual];
+  if (tema?.fondo) {
+    mesa.style.backgroundColor = tema.fondo;
+  }
+  
+  // Manejar partículas
+  const tipoParticula = tema?.particula;
+  const particulasConfig = {
+    blanca: ['#FAFAFA', '#FAFAFA'],
+    roja: ['#C85A54', '#E8B8B8'],
+    amarilla: ['#f0d878', '#F5E6B0'],
+    verde: ['#88cc00', '#D1FF9A'],
+    azul: ['#1E3A8A', '#8AB4F8']
+  };
+  
+  // Detener particle system anterior
+  if (particleSystem) {
+    particleSystem.stop();
+    particleSystem = null;
+  }
+  
+  // Crear e iniciar nueva partícula si el tema tiene una
+  if (tipoParticula && particulasConfig[tipoParticula]) {
+    particleSystem = new ParticleSystem('mesa', particulasConfig[tipoParticula]);
+    particleSystem.start();
+  }
+  
+  const tarjetas = tema || [];
+  
+  // Ocultar sección si no hay tarjeta seleccionada
+  if (!state.tarjetaSeleccionada) {
+    document.getElementById('seccionGridAbierta').style.display = 'none';
+  }
+  
+  tarjetas.forEach(card => {
+    const cardEl = document.createElement('div');
+    cardEl.className = `card ${card.borde}`;
+    if (state.tarjetaSeleccionada === card.id) {
+      cardEl.classList.add('selected');
+    }
+    
+    cardEl.style.left = card.x + 'px';
+    cardEl.style.top = card.y + 'px';
+    cardEl.style.transform = `scale(${card.scale})`;
+    cardEl.dataset.id = card.id;
+    
+    // Contenedor de contenido
+    const contentContainer = document.createElement('div');
+    
+    // Título
+    const title = document.createElement('div');
+    title.className = 'card-title';
+    title.contentEditable = 'false';
+    title.spellcheck = 'false';
+    title.textContent = card.titulo || 'Tarjeta ' + card.id;
+    
+    // Al clickear, pasar a editable
+    title.addEventListener('click', (e) => {
+      e.stopPropagation();
+      title.contentEditable = 'true';
+      title.focus();
+    });
+    
+    title.addEventListener('blur', () => {
+      title.contentEditable = 'false';
+      card.titulo = title.textContent;
+      saveToStorage();
+    });
+    
+    title.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        title.blur();
+      }
+    });
+    contentContainer.appendChild(title);
+    
+    // Grid
+    const grid = document.createElement('div');
+    grid.className = 'card-grid';
+    grid.style.gridTemplateColumns = `repeat(${card.cols}, auto)`;
+    
+    const numFilas = card.contenido.length;
+    for (let fila = 0; fila < numFilas; fila++) {
+      for (let col = 0; col < card.cols; col++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.contentEditable = 'false';
+        cell.spellcheck = 'false';
+        // Cargar innerHTML para mostrar <br>
+        cell.innerHTML = card.contenido[fila]?.[col] || '';
+        cell.dataset.fila = fila;
+        cell.dataset.col = col;
+        
+        // Al clickear, pasar a editable
+        cell.addEventListener('click', (e) => {
+          e.stopPropagation();
+          cell.contentEditable = 'true';
+          cell.focus();
+        });
+        
+        cell.addEventListener('blur', () => {
+          cell.contentEditable = 'false';
+          if (!card.contenido[fila]) card.contenido[fila] = [];
+          // Guardar innerHTML para preservar <br>
+          card.contenido[fila][col] = cell.innerHTML;
+          saveToStorage();
+        });
+        
+        cell.addEventListener('keydown', (e) => {
+          if (e.key === 'Tab') {
+            e.preventDefault();
+            const nextCol = col + 1;
+            if (nextCol < card.cols) {
+              const nextCell = grid.querySelector(`[data-fila="${fila}"][data-col="${nextCol}"]`);
+              if (nextCell) nextCell.focus();
+            }
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            // Insertar un <br> en lugar de crear un div
+            document.execCommand('insertLineBreak');
+          }
+        });
+        
+        grid.appendChild(cell);
+      }
+    }
+    
+    contentContainer.appendChild(grid);
+    cardEl.appendChild(contentContainer);
+    
+    // Eventos de la tarjeta
+    cardEl.addEventListener('pointerdown', (e) => {
+      // Si clickeás una celda, que se enfoque para editar
+      if (e.target.classList.contains('cell')) {
+        e.target.focus();
+        return;
+      }
+      // Si clickeás el título, que se enfoque
+      if (e.target.classList.contains('card-title')) {
+        e.target.focus();
+        return;
+      }
+      // Si clickeás en otro lado de la tarjeta, seleccioná la tarjeta
+      selectCard(card.id);
+    });
+    
+    mesa.appendChild(cardEl);
+  });
+}
+
+// ===== SELECCIONAR TARJETA =====
+function selectCard(id) {
+  state.tarjetaSeleccionada = id;
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === id);
+  if (tarjeta) {
+    state.bordeSeleccionado = tarjeta.borde;
+    state.colsSeleccionadas = tarjeta.cols;
+    updateBordeButtons();
+    updateColsButtons();
+    document.getElementById('seccionGridAbierta').style.display = 'block';
+    document.getElementById('seccionBorrar').style.display = 'block';
+    document.getElementById('seccionEscala').style.display = 'block';
+    // Actualizar slider
+    document.getElementById('sliderEscala').value = tarjeta.scale;
+    document.getElementById('escalaLabel').textContent = Math.round(tarjeta.scale * 100) + '%';
+  }
+  renderCards();
+}
+
+// ===== BORDES =====
+function aplicarBorde() {
+  if (!state.tarjetaSeleccionada || !state.bordeSeleccionado) return;
+  
+  const tarjetas = state.datos[state.unidadActual][state.temaActual];
+  
+  if (state.aplicarA === 'una') {
+    const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
+    if (card) card.borde = state.bordeSeleccionado;
+  } else if (state.aplicarA === 'todas') {
+    tarjetas.forEach(c => c.borde = state.bordeSeleccionado);
+  }
+  
+  renderCards();
+  saveToStorage();
+}
+
+function aplicarCols() {
+  if (!state.tarjetaSeleccionada) return;
+  
+  const tarjetas = state.datos[state.unidadActual][state.temaActual];
+  const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
+  
+  if (card) {
+    const nuevoCols = state.colsSeleccionadas;
+    const oldCols = card.cols;
+    
+    // Expande o contrae contenido
+    if (nuevoCols > oldCols) {
+      for (let i = oldCols; i < nuevoCols; i++) {
+        card.contenido[i] = [''];
+      }
+    } else if (nuevoCols < oldCols) {
+      card.contenido = card.contenido.slice(0, nuevoCols);
+    }
+    
+    card.cols = nuevoCols;
+  }
+  
+  renderCards();
+  saveToStorage();
+}
+
+// ===== POINTER EVENTS (como Letritas) =====
+const pointers = new Map();
+let dragInfo = null;
+let pinchInicial = null;
+let modo = null;
+
+function distanciaEntre(p1, p2) {
+  return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+}
+
+function escalaActual() {
+  const tarjeta = document.querySelector(`[data-id="${state.tarjetaSeleccionada}"]`);
+  if (!tarjeta) return 1;
+  const match = tarjeta.style.transform.match(/scale\(([\d.]+)\)/);
+  return match ? parseFloat(match[1]) : 1;
+}
+
+function aplicarEscala(cardId, escala) {
+  const tarjeta = document.querySelector(`[data-id="${cardId}"]`);
+  if (tarjeta) {
+    tarjeta.style.transform = `scale(${escala})`;
+  }
+}
+
+function onPointerDown(ev) {
+  // Si estamos editando (contentEditable activo), no hacer nada
+  if (document.activeElement?.contentEditable === 'true') return;
+  
+  const cardEl = ev.target.closest('.card');
+  if (!cardEl) return;
+  
+  // Si el target es una celda o título, no iniciar drag
+  if (ev.target.classList.contains('cell') || ev.target.classList.contains('card-title')) {
+    return;
+  }
+  
+  const cardId = parseInt(cardEl.dataset.id);
+  selectCard(cardId);
+  
+  pointers.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+  
+  if (pointers.size === 1) {
+    ev.preventDefault();
+    modo = 'arrastre';
+    const mesa = document.getElementById('mesa');
+    const rectMesa = mesa.getBoundingClientRect();
+    const rectCard = cardEl.getBoundingClientRect();
+    
+    // Calcular offset desde el punto de toque al top-left de la tarjeta
+    dragInfo = {
+      cardId,
+      startX: parseInt(cardEl.style.left) || 0,
+      startY: parseInt(cardEl.style.top) || 0,
+      touchStartX: ev.clientX,
+      touchStartY: ev.clientY,
+      maxX: rectMesa.width - rectCard.width,
+      maxY: rectMesa.height - rectCard.height,
+      rectMesa
+    };
+  } else if (pointers.size === 2) {
+    ev.preventDefault();
+    modo = 'pellizco';
+    const pts = Array.from(pointers.values());
+    pinchInicial = { 
+      distancia: distanciaEntre(pts[0], pts[1]), 
+      escala: escalaActual() 
+    };
+  }
+}
+
+function onPointerMove(ev) {
+  if (!pointers.has(ev.pointerId)) return;
+  pointers.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+  
+  if (modo === 'arrastre' && pointers.size === 1 && dragInfo) {
+    // Calcular delta desde el inicio del toque
+    const deltaX = ev.clientX - dragInfo.touchStartX;
+    const deltaY = ev.clientY - dragInfo.touchStartY;
+    
+    // Nueva posición = posición inicial + delta
+    let newX = dragInfo.startX + deltaX;
+    let newY = dragInfo.startY + deltaY;
+    
+    // Limitar dentro de la mesa
+    newX = Math.max(0, Math.min(newX, dragInfo.maxX));
+    newY = Math.max(0, Math.min(newY, dragInfo.maxY));
+    
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const card = tarjetas.find(c => c.id === dragInfo.cardId);
+    if (card) {
+      card.x = newX;
+      card.y = newY;
+      renderCards();
+    }
+  } else if (modo === 'pellizco' && pointers.size === 2 && pinchInicial) {
+    const pts = Array.from(pointers.values());
+    const factor = distanciaEntre(pts[0], pts[1]) / pinchInicial.distancia;
+    const nueva = Math.min(2.5, Math.max(0.5, pinchInicial.escala * factor));
+    
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
+    if (card) {
+      card.scale = nueva;
+      renderCards();
+    }
+  }
+}
+
+function onPointerUp(ev) {
+  pointers.delete(ev.pointerId);
+  
+  if (modo === 'arrastre' && dragInfo) {
+    saveToStorage();
+  } else if (modo === 'pellizco') {
+    saveToStorage();
+  }
+  
+  if (pointers.size < 2) {
+    modo = null;
+    dragInfo = null;
+    pinchInicial = null;
+  }
+}
+
+// ===== EDITOR TOGGLE =====
+function toggleEditor() {
+  state.editorActivo = !state.editorActivo;
+  document.getElementById('panelEditor').classList.toggle('hidden', !state.editorActivo);
+  document.getElementById('btnToggleEditor').classList.toggle('active', state.editorActivo);
+}
+
+// ===== UI UPDATES =====
+function updateBordeButtons() {
+  document.querySelectorAll('[data-borde]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.borde === state.bordeSeleccionado);
+  });
+}
+
+function updateColsButtons() {
+  document.querySelectorAll('[data-cols]').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.cols) === state.colsSeleccionadas);
+  });
+}
+
+function updateAplicarButtons() {
+  document.getElementById('btnAplicarUna').classList.toggle('active', state.aplicarA === 'una');
+  document.getElementById('btnAplicarTodas').classList.toggle('active', state.aplicarA === 'todas');
+}
+
+// ===== STORAGE =====
+function saveToStorage() {
+  localStorage.setItem('cuaderno-state', JSON.stringify(state.datos));
+}
+
+function loadFromStorage() {
+  // Limpiar localStorage para resetear
+  localStorage.removeItem('cuaderno-state');
+  
+  const saved = localStorage.getItem('cuaderno-state');
+  if (saved) {
+    state.datos = JSON.parse(saved);
+  }
+}
+
+// ===== PARTICLE SYSTEM =====
+class ParticleSystem {
+  constructor(containerId, colors = null) {
+    this.container = document.getElementById(containerId);
+    this.particles = [];
+    this.active = false;
+    this.colors = colors;
+    this.init();
+  }
+  
+  init() {
+    if (!document.querySelector('style[data-particles-style]')) {
+      const style = document.createElement('style');
+      style.setAttribute('data-particles-style', 'true');
+      style.textContent = `
+        @keyframes particleFadeInOut {
+          0% { opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    for (let i = 0; i < 15; i++) {
+      const color = this.colors[i % this.colors.length];
+      this.createParticle(color);
+    }
+  }
+  
+  createParticle(color) {
+    const particle = {
+      element: document.createElement('div'),
+      color: color
+    };
+    
+    particle.element.style.cssText = `
+      position: fixed;
+      pointer-events: none;
+      border-radius: 50%;
+      box-shadow: 0 0 8px ${color};
+      z-index: 0;
+    `;
+    
+    this.particles.push(particle);
+    this.resetParticle(particle);
+  }
+  
+  resetParticle(particle) {
+    if (!this.active && particle.element.parentElement) return;
+    
+    const x = Math.random() * (window.innerWidth - 30);
+    const y = Math.random() * (window.innerHeight - 30);
+    const size = Math.random() * 14 + 7;
+    const duration = Math.random() * 5000 + 10000;
+    const delay = Math.random() * 3000;
+    const rotation = Math.random() * 360;
+    
+    particle.element.style.left = x + 'px';
+    particle.element.style.top = y + 'px';
+    particle.element.style.width = size + 'px';
+    particle.element.style.height = size + 'px';
+    particle.element.style.backgroundColor = particle.color;
+    particle.element.style.opacity = '0';
+    particle.element.style.animation = 'none';
+    particle.element.style.transform = `rotate(${rotation}deg)`;
+    
+    void particle.element.offsetWidth;
+    
+    particle.element.style.animation = `particleFadeInOut ${duration}ms ease-in-out ${delay}ms forwards`;
+    
+    setTimeout(() => this.resetParticle(particle), delay + duration + 50);
+  }
+  
+  start() {
+    if (this.active) return;
+    this.active = true;
+    this.particles.forEach(p => {
+      if (!p.element.parentElement) {
+        document.body.appendChild(p.element);
+      }
+    });
+  }
+  
+  stop() {
+    if (!this.active) return;
+    this.active = false;
+    this.particles.forEach(p => {
+      if (p.element.parentElement) {
+        p.element.parentElement.removeChild(p.element);
+      }
+    });
+  }
+}
+
+// Variables de partículas
+let particleSystem = null;
+
+// ===== START =====
+init();
+
+</script>
+
+</body>
+</html>
