@@ -2284,8 +2284,17 @@ function renderCards() {
             }
           } else if (e.key === 'Enter') {
             e.preventDefault();
-            // Insertar un <br> en lugar de crear un div
-            document.execCommand('insertLineBreak');
+            const nextFila = fila + 1;
+            
+            if (nextFila < numFilas) {
+              // Ir a la celda de abajo (misma columna)
+              const nextCell = cardEl.querySelector(`[data-fila="${nextFila}"][data-col="${col}"]`);
+              if (nextCell) {
+                nextCell.contentEditable = 'true';
+                nextCell.focus();
+                state.celdaSeleccionada = { tarjetaId: card.id, fila: nextFila, col };
+              }
+            }
           }
         });
         
