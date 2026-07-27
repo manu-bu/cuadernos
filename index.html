@@ -1886,8 +1886,25 @@ function aplicarBold(bold) {
   }
   
   saveToStorage();
+  
+  // Actualizar el DOM sin redibujarlo todo
+  if (esTitle) {
+    const titleEl = document.querySelector(`.card[data-id="${tarjetaId}"] .card-title`);
+    if (titleEl) {
+      titleEl.style.fontWeight = bold ? '700' : '400';
+      titleEl.focus();
+      titleEl.contentEditable = 'true';
+    }
+  } else {
+    const cellEl = document.querySelector(`.card[data-id="${tarjetaId}"] [data-fila="${fila}"][data-col="${col}"]`);
+    if (cellEl) {
+      cellEl.style.fontWeight = bold ? '700' : '400';
+      cellEl.focus();
+      cellEl.contentEditable = 'true';
+    }
+  }
+  
   renderSelectorEstilos();
-  renderCards();
 }
 
 function aplicarEstiloACelda(estilos) {
@@ -2271,6 +2288,13 @@ function renderCards() {
               if (nextCell) {
                 nextCell.contentEditable = 'true';
                 nextCell.focus();
+                // Posicionar cursor al final
+                const range = document.createRange();
+                const sel = window.getSelection();
+                range.selectNodeContents(nextCell);
+                range.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(range);
                 state.celdaSeleccionada = { tarjetaId: card.id, fila, col: nextCol };
               }
             } else if (nextFila < numFilas) {
@@ -2279,6 +2303,13 @@ function renderCards() {
               if (nextCell) {
                 nextCell.contentEditable = 'true';
                 nextCell.focus();
+                // Posicionar cursor al final
+                const range = document.createRange();
+                const sel = window.getSelection();
+                range.selectNodeContents(nextCell);
+                range.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(range);
                 state.celdaSeleccionada = { tarjetaId: card.id, fila: nextFila, col: 0 };
               }
             }
@@ -2292,6 +2323,13 @@ function renderCards() {
               if (nextCell) {
                 nextCell.contentEditable = 'true';
                 nextCell.focus();
+                // Posicionar cursor al final
+                const range = document.createRange();
+                const sel = window.getSelection();
+                range.selectNodeContents(nextCell);
+                range.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(range);
                 state.celdaSeleccionada = { tarjetaId: card.id, fila: nextFila, col };
               }
             }
