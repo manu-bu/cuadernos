@@ -19,17 +19,17 @@
   --header-h: 72px;
   
   --bg-app: #f0ebe5;
-  --header-bg: #e9e9e7;
-  --border-header: #d4d4d2;
+  --header-bg: #e5d5c3;
+  --border-header: #c4956b;
   
   --sel-h: 44px;
   --sel-radius: 22px;
   --sel-border: 3.5px;
-  --sel-color: #9a9a98;
+  --sel-color: #d4b89f;
   
   --card-radius: 16px;
   --card-padding: 16px;
-  --card-border-w: 3.5px;
+  --card-border-w: 2.5px;
   --card-bg: #ffffff;
   
   --font: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
@@ -72,12 +72,12 @@ header {
 .selector {
   height: var(--sel-h);
   border-radius: var(--sel-radius);
-  border: var(--sel-border) solid #c8c8c6;
+  border: var(--sel-border) solid #c4956b;
   background: #ffffff;
   padding: 0 16px;
   font-size: 14px;
-  color: var(--sel-color);
-  font-weight: 600;
+  color: #2a2a2a;
+  font-weight: 700;
   font-family: var(--font);
   cursor: pointer;
   transition: all 0.15s;
@@ -89,12 +89,13 @@ header {
 }
 
 .selector:hover {
-  border-color: #a8a8a6;
+  border-color: #a8795a;
+  background: #f9f9f7;
 }
 
 .selector.active {
-  color: #2a2a28;
-  border-color: #888886;
+  color: #2a2a2a;
+  border-color: #a8795a;
   background: #f9f9f7;
 }
 
@@ -108,10 +109,12 @@ header {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: var(--sel-border) solid #b8b8b6;
+  border: var(--sel-border) solid #c4956b;
   background: #ffffff;
-  font-size: 20px;
+  font-size: 18px;
+  font-weight: 700;
   font-family: var(--font);
+  color: #2a2a2a;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -120,7 +123,7 @@ header {
 }
 
 .btn:hover {
-  border-color: #888886;
+  border-color: #a8795a;
   background: #f9f9f7;
 }
 
@@ -170,7 +173,7 @@ header {
   left: 0;
   width: 100%;
   height: calc(100dvh - var(--header-h));
-  background: var(--bg-app);
+  background: transparent;
   overflow: hidden;
   touch-action: none;
   perspective: 1000px;
@@ -186,6 +189,7 @@ header {
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
+  z-index: 10;
   
   /* Default: borde simple gris */
   border: var(--card-border-w) solid #d4d4d2;
@@ -233,60 +237,211 @@ header {
   border: var(--card-border-w) solid #6FCF3D;
 }
 
-.card.borde-terreno {
+/* BORDES TIPO SELECTOR - Gradientes degradados */
+.card.borde-abecedario {
   border: var(--card-border-w) solid transparent;
   background:
     linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
-    linear-gradient(135deg, #8B7B6F, #D9CFC4) border-box;
+    linear-gradient(135deg, #4A9FB5, #B5D9E8) border-box;
 }
 
-.card.borde-flora {
+.card.borde-verbos {
   border: var(--card-border-w) solid transparent;
   background:
     linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
-    linear-gradient(135deg, #6FCF3D, #C5EBA8) border-box;
+    conic-gradient(#FFC93C, #F0932F, #C85A54, #FF4D9F, #8557D4, #17B8CE, #6FCF3D, #FFC93C) border-box;
 }
 
-.card.borde-verano {
+.card.borde-colores {
   border: var(--card-border-w) solid transparent;
   background:
     linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
-    linear-gradient(135deg, #f0d878, #f5e6b0) border-box;
-}
-
-.card.borde-clima {
-  border: var(--card-border-w) solid transparent;
-  background:
-    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
-    conic-gradient(from 0deg, #ffffff 0deg, #b0b0ae 75deg, #8ec6e0 190deg, #f0d878 280deg, #f0a8c0 320deg, #ffffff 360deg) border-box;
+    conic-gradient(#C85A54, #F0932F, #FFC93C, #6FCF3D, #B8E3F0, #8557D4, #E89CB8, #C85A54) border-box;
 }
 
 .card.borde-terreno {
   border: var(--card-border-w) solid transparent;
   background:
     linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(#8B7355, #556B2F, #808080, #1B4D3E, #FFFFFF, #8B7355) border-box;
+}
+
+.card.borde-gastronomia {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
     linear-gradient(135deg, #8B7B6F, #D9CFC4) border-box;
 }
 
-.card.borde-flora {
+.card.borde-invierno {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #4fd1d9, #9fd1f0) border-box;
+}
+
+.card.borde-actividades {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from 0deg, #f2994a 0deg, #d6409f 130deg, #8b5cf6 250deg, #4fd1d9 320deg, #f2994a 360deg) border-box;
+}
+
+.card.borde-estaciones {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from 0deg, #ffffff 0deg, #b0b0ae 75deg, #8ec6e0 190deg, #f0d878 280deg, #f0a8c0 320deg, #ffffff 360deg) border-box;
+}
+
+/* BORDES LED-STRIP (Modos y Frases) */
+.card.borde-imperativo {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from 0deg, #E8392B 0deg, #F2811D 60deg, #F5C518 120deg, #E8392B 360deg) border-box;
+}
+
+.card.borde-subjuntivo {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from 0deg, #6B3FA0 0deg, #B08FD8 60deg, #D875A8 120deg, #6B3FA0 360deg) border-box;
+}
+
+.card.borde-preguntas {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from 0deg, #6FC9A0 0deg, #2E9EA8 60deg, #3ECFAE 120deg, #6FC9A0 360deg) border-box;
+}
+
+.card.borde-frases {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from 0deg, #D9C39A 0deg, #C4993A 60deg, #7A4A21 120deg, #D9C39A 360deg) border-box;
+}
+
+.card.borde-negacion {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from 0deg, #C0392B 0deg, #D9662D 60deg, #B83A72 120deg, #C0392B 360deg) border-box;
+}
+
+.card.borde-condicional {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from 0deg, #1E3A8A 0deg, #3B82F6 60deg, #06B6D4 120deg, #1E3A8A 360deg) border-box;
+}
+
+.card.borde-accion {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from 0deg, #15803D 0deg, #22C55E 60deg, #84CC16 120deg, #15803D 360deg) border-box;
+}
+
+/* BORDES CASOS (Ruso) */
+.card.borde-caso1 {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #C85A54, #F7B8BE) border-box;
+}
+
+.card.borde-caso2 {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #6B6B63, #D0CFC5) border-box;
+}
+
+.card.borde-caso3 {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #8557D4, #D4C4F0) border-box;
+}
+
+.card.borde-caso4 {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #1B4D3E, #7FB3A0) border-box;
+}
+
+.card.borde-caso5 {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #B8860B, #F0E68C) border-box;
+}
+
+.card.borde-caso6 {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #4A9FB5, #B5D9E8) border-box;
+}
+
+/* BORDES TIEMPOS (8 tiempos verbales) */
+.card.borde-tiempo0 {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #C85A54, #F7B8BE) border-box;
+}
+
+.card.borde-tiempo1 {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #F0932F, #F9D4B8) border-box;
+}
+
+.card.borde-tiempo2 {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #FFC93C, #FFE9A8) border-box;
+}
+
+.card.borde-tiempo3 {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #FF4D9F, #FFB8D9) border-box;
+}
+
+.card.borde-tiempo4 {
+  border: var(--card-border-w) solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, #2A2A2A, #B8B8B8) border-box;
+}
+
+.card.borde-tiempo5 {
   border: var(--card-border-w) solid transparent;
   background:
     linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
     linear-gradient(135deg, #6FCF3D, #C5EBA8) border-box;
 }
 
-.card.borde-verano {
+.card.borde-tiempo6 {
   border: var(--card-border-w) solid transparent;
   background:
     linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
-    linear-gradient(135deg, #f0d878, #f5e6b0) border-box;
+    linear-gradient(135deg, #17B8CE, #A8E8F0) border-box;
 }
 
-.card.borde-clima {
+.card.borde-tiempo7 {
   border: var(--card-border-w) solid transparent;
   background:
     linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
-    conic-gradient(from 0deg, #ffffff 0deg, #b0b0ae 75deg, #8ec6e0 190deg, #f0d878 280deg, #f0a8c0 320deg, #ffffff 360deg) border-box;
+    linear-gradient(135deg, #8557D4, #D4C4F0) border-box;
 }
 
 /* Contenedor de columnas */
@@ -423,7 +578,7 @@ header {
 }
 
 .modal-content {
-  background: #ffffff;
+  background: #f5ead8;
   border-radius: 12px;
   width: 90%;
   max-width: 700px;
@@ -435,10 +590,11 @@ header {
 
 .modal-header {
   padding: 20px;
-  border-bottom: 1px solid #e0e0de;
+  border-bottom: 2px solid #e5d5c3;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: #ede4d2;
 }
 
 .modal-header h2 {
@@ -452,16 +608,18 @@ header {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: none;
-  background: #f0f0ee;
+  border: 2px solid #c4956b;
+  background: #f5ead8;
   font-size: 16px;
   font-family: var(--font);
+  color: #2a2a2a;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .btn-cerrar:hover {
-  background: #e0e0de;
+  background: #ede4d2;
+  border-color: #a8795a;
 }
 
 .modal-body {
@@ -475,7 +633,8 @@ header {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
-  border-right: 1px solid #e0e0de;
+  border-right: 1px solid #e5d5c3;
+  background: #f5ead8;
 }
 
 .modal-col:last-child {
@@ -585,7 +744,7 @@ header {
   top: var(--header-h);
   width: 280px;
   height: calc(100dvh - var(--header-h));
-  background: #f9f9f7;
+  background: #f5ead8;
   border-left: 1px solid var(--border-header);
   padding: 16px;
   overflow-y: auto;
@@ -643,6 +802,56 @@ header {
   font-weight: 600;
 }
 
+.panel-btn.compact {
+  min-width: 40px;
+  padding: 6px 4px;
+  font-size: 10px;
+}
+
+.panel-btn.active-arena {
+  border-color: #c8b4a0;
+  background: #e8dcc8;
+  color: #2a2a2a;
+  font-weight: 600;
+}
+
+.borde-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 60px;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  background: #ffffff;
+  font-size: 10px;
+  font-family: var(--font);
+  color: #2a2a2a;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.borde-visual:hover {
+  background: #f5f5f3;
+}
+
+.borde-visual.active {
+  background: #e8dcc8;
+  box-shadow: 0 0 8px rgba(200, 180, 150, 0.3);
+}
+
+.borde-preview {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 </style>
 
 </head>
@@ -661,13 +870,13 @@ header {
   </div>
   
   <div class="header-right">
-    <button class="btn" id="btnEditarEstructura" title="Editar estructura">🌳</button>
-    <button class="btn" id="btnModoVoz" title="Modo Voz">🔊</button>
-    <button class="btn" id="btnEditarFondo" title="Editar fondo">🎨</button>
-    <button class="btn" id="btnDescargar" title="Descargar backup">💾</button>
-    <button class="btn" id="btnCargar" title="Cargar backup">📂</button>
-    <button class="btn" id="btnAddCard" title="Agregar tarjeta">➕</button>
-    <button class="btn" id="btnToggleEditor" title="Toggle editor">✏️</button>
+    <button class="btn" id="btnEditarEstructura" title="Editar estructura">A</button>
+    <button class="btn" id="btnModoVoz" title="Modo Voz">S</button>
+    <button class="btn" id="btnEditarFondo" title="Editar fondo">P</button>
+    <button class="btn" id="btnDescargar" title="Descargar backup">G</button>
+    <button class="btn" id="btnCargar" title="Cargar backup">C</button>
+    <button class="btn" id="btnAddCard" title="Agregar tarjeta">M</button>
+    <button class="btn" id="btnToggleEditor" title="Toggle editor">E</button>
   </div>
 </header>
 
@@ -675,41 +884,172 @@ header {
 <div class="panel-derecho hidden" id="panelEditor">
   <div class="panel-section">
     <div class="panel-label">Bordes</div>
-    <div class="panel-buttons">
-      <button class="panel-btn" data-borde="borde-simple">Simple</button>
-      <button class="panel-btn" data-borde="borde-punteado">Punteado</button>
-      <button class="panel-btn" data-borde="borde-doble">Doble</button>
-      <button class="panel-btn" data-borde="borde-grosor">Grueso</button>
+    <div class="panel-buttons" style="gap: 12px;">
+      <button class="borde-visual" data-borde="borde-simple" title="Simple">
+        <div class="borde-preview" style="border: 2.5px solid #d4d4d2;"></div>
+        <span>Simple</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-punteado" title="Punteado">
+        <div class="borde-preview" style="border: 2.5px dashed #8a8a88;"></div>
+        <span>Punteado</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-doble" title="Doble">
+        <div class="borde-preview" style="border: 2.5px double #b8b8b6;"></div>
+        <span>Doble</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-grosor" title="Grueso">
+        <div class="borde-preview" style="border: 4px solid #6b6b69;"></div>
+        <span>Grueso</span>
+      </button>
     </div>
-    <div class="panel-label" style="margin-top: 12px;">Colores</div>
-    <div class="panel-buttons">
-      <button class="panel-btn" data-borde="borde-color-a">Rojo</button>
-      <button class="panel-btn" data-borde="borde-color-b">Azul</button>
-      <button class="panel-btn" data-borde="borde-color-c">Verde</button>
+    <div class="panel-label" style="margin-top: 12px;">Gradientes Temáticos</div>
+    <div class="panel-buttons" style="gap: 12px;">
+      <button class="borde-visual" data-borde="borde-abecedario" title="Abecedario">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(135deg, #4A9FB5, #B5D9E8) padding-box, linear-gradient(135deg, #4A9FB5, #B5D9E8) border-box; box-sizing: border-box;"></div>
+        <span>Abecedario</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-verbos" title="Verbos">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(#FFC93C, #F0932F, #C85A54, #FF4D9F, #8557D4, #17B8CE, #6FCF3D, #FFC93C) border-box; box-sizing: border-box;"></div>
+        <span>Verbos</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-colores" title="Colores">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(#C85A54, #F0932F, #FFC93C, #6FCF3D, #B8E3F0, #8557D4, #E89CB8, #C85A54) border-box; box-sizing: border-box;"></div>
+        <span>Colores</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-terreno" title="Terreno">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(#8B7355, #556B2F, #808080, #1B4D3E, #FFFFFF, #8B7355) border-box; box-sizing: border-box;"></div>
+        <span>Terreno</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-gastronomia" title="Gastronomía">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #8B7B6F, #D9CFC4) border-box; box-sizing: border-box;"></div>
+        <span>Gastronomía</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-invierno" title="Invierno">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #4fd1d9, #9fd1f0) border-box; box-sizing: border-box;"></div>
+        <span>Invierno</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-actividades" title="Actividades">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(from 0deg, #f2994a 0deg, #d6409f 130deg, #8b5cf6 250deg, #4fd1d9 320deg, #f2994a 360deg) border-box; box-sizing: border-box;"></div>
+        <span>Actividades</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-estaciones" title="Estaciones">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(from 0deg, #ffffff 0deg, #b0b0ae 75deg, #8ec6e0 190deg, #f0d878 280deg, #f0a8c0 320deg, #ffffff 360deg) border-box; box-sizing: border-box;"></div>
+        <span>Estaciones</span>
+      </button>
     </div>
-    <div class="panel-label" style="margin-top: 12px;">Gradientes</div>
-    <div class="panel-buttons">
-      <button class="panel-btn" data-borde="borde-clima">Clima</button>
-      <button class="panel-btn" data-borde="borde-terreno">Terreno</button>
-      <button class="panel-btn" data-borde="borde-flora">Flora</button>
+    
+    <div class="panel-label" style="margin-top: 12px;">Modos y Frases (LED)</div>
+    <div class="panel-buttons" style="gap: 12px;">
+      <button class="borde-visual" data-borde="borde-imperativo" title="Imperativo">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(from 0deg, #E8392B 0deg, #F2811D 60deg, #F5C518 120deg, #E8392B 360deg) border-box; box-sizing: border-box;"></div>
+        <span>Imperativo</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-subjuntivo" title="Subjuntivo">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(from 0deg, #6B3FA0 0deg, #B08FD8 60deg, #D875A8 120deg, #6B3FA0 360deg) border-box; box-sizing: border-box;"></div>
+        <span>Subjuntivo</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-preguntas" title="Preguntas">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(from 0deg, #6FC9A0 0deg, #2E9EA8 60deg, #3ECFAE 120deg, #6FC9A0 360deg) border-box; box-sizing: border-box;"></div>
+        <span>Preguntas</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-frases" title="Frases">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(from 0deg, #D9C39A 0deg, #C4993A 60deg, #7A4A21 120deg, #D9C39A 360deg) border-box; box-sizing: border-box;"></div>
+        <span>Frases</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-negacion" title="Negación">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(from 0deg, #C0392B 0deg, #D9662D 60deg, #B83A72 120deg, #C0392B 360deg) border-box; box-sizing: border-box;"></div>
+        <span>Negación</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-condicional" title="Condicional">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(from 0deg, #1E3A8A 0deg, #3B82F6 60deg, #06B6D4 120deg, #1E3A8A 360deg) border-box; box-sizing: border-box;"></div>
+        <span>Condicional</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-accion" title="Acción">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, conic-gradient(from 0deg, #15803D 0deg, #22C55E 60deg, #84CC16 120deg, #15803D 360deg) border-box; box-sizing: border-box;"></div>
+        <span>Acción</span>
+      </button>
+    </div>
+    
+    <div class="panel-label" style="margin-top: 12px;">Casos (Ruso)</div>
+    <div class="panel-buttons" style="gap: 12px;">
+      <button class="borde-visual" data-borde="borde-caso1" title="Caso 1">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #C85A54, #F7B8BE) border-box; box-sizing: border-box;"></div>
+        <span>Caso 1</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-caso2" title="Caso 2">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #6B6B63, #D0CFC5) border-box; box-sizing: border-box;"></div>
+        <span>Caso 2</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-caso3" title="Caso 3">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #8557D4, #D4C4F0) border-box; box-sizing: border-box;"></div>
+        <span>Caso 3</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-caso4" title="Caso 4">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #1B4D3E, #7FB3A0) border-box; box-sizing: border-box;"></div>
+        <span>Caso 4</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-caso5" title="Caso 5">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #B8860B, #F0E68C) border-box; box-sizing: border-box;"></div>
+        <span>Caso 5</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-caso6" title="Caso 6">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #4A9FB5, #B5D9E8) border-box; box-sizing: border-box;"></div>
+        <span>Caso 6</span>
+      </button>
+    </div>
+    
+    <div class="panel-label" style="margin-top: 12px;">Tiempos Verbales</div>
+    <div class="panel-buttons" style="gap: 12px;">
+      <button class="borde-visual" data-borde="borde-tiempo0" title="Tiempo 0">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #C85A54, #F7B8BE) border-box; box-sizing: border-box;"></div>
+        <span>T0</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-tiempo1" title="Tiempo 1">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #F0932F, #F9D4B8) border-box; box-sizing: border-box;"></div>
+        <span>T1</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-tiempo2" title="Tiempo 2">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #FFC93C, #FFE9A8) border-box; box-sizing: border-box;"></div>
+        <span>T2</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-tiempo3" title="Tiempo 3">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #FF4D9F, #FFB8D9) border-box; box-sizing: border-box;"></div>
+        <span>T3</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-tiempo4" title="Tiempo 4">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #2A2A2A, #B8B8B8) border-box; box-sizing: border-box;"></div>
+        <span>T4</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-tiempo5" title="Tiempo 5">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #6FCF3D, #C5EBA8) border-box; box-sizing: border-box;"></div>
+        <span>T5</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-tiempo6" title="Tiempo 6">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #17B8CE, #A8E8F0) border-box; box-sizing: border-box;"></div>
+        <span>T6</span>
+      </button>
+      <button class="borde-visual" data-borde="borde-tiempo7" title="Tiempo 7">
+        <div class="borde-preview" style="border: 2.5px solid transparent; background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #8557D4, #D4C4F0) border-box; box-sizing: border-box;"></div>
+        <span>T7</span>
+      </button>
     </div>
   </div>
   
   <div class="panel-section">
     <div class="panel-label">Aplicar a</div>
     <div class="panel-buttons">
-      <button class="panel-btn" id="btnAplicarUna">Esta tarjeta</button>
-      <button class="panel-btn" id="btnAplicarTodas">Todas en tema</button>
+      <button class="panel-btn" id="btnAplicarUna" style="color: #2a2a2a;">Esta tarjeta</button>
+      <button class="panel-btn" id="btnAplicarTodas" style="color: #2a2a2a;">Todas en tema</button>
     </div>
   </div>
   
   <div class="panel-section" id="seccionGridAbierta" style="display: none;">
     <div class="panel-label">Filas y Columnas</div>
     <div class="panel-buttons">
-      <button class="panel-btn" id="btnAddRow">+ Fila</button>
-      <button class="panel-btn" id="btnDelRow">- Fila</button>
-      <button class="panel-btn" id="btnAddCol">+ Columna</button>
-      <button class="panel-btn" id="btnDelCol">- Columna</button>
+      <button class="panel-btn compact" id="btnAddRow" style="color: #2a2a2a;">+F</button>
+      <button class="panel-btn compact" id="btnDelRow" style="color: #2a2a2a;">-F</button>
+      <button class="panel-btn compact" id="btnAddCol" style="color: #2a2a2a;">+C</button>
+      <button class="panel-btn compact" id="btnDelCol" style="color: #2a2a2a;">-C</button>
     </div>
   </div>
   
@@ -737,6 +1077,14 @@ header {
     <div class="panel-label">Estilo de Celda</div>
     
     <div style="margin-bottom: 12px;">
+      <div style="font-size: 11px; font-weight: 600; color: #6a6a68; margin-bottom: 6px; text-transform: uppercase;">Peso</div>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+        <button class="panel-btn" onclick="aplicarBold(true)" style="font-weight: 700;">Bold</button>
+        <button class="panel-btn" onclick="aplicarBold(false)">Normal</button>
+      </div>
+    </div>
+    
+    <div style="margin-bottom: 12px;">
       <div style="font-size: 11px; font-weight: 600; color: #6a6a68; margin-bottom: 6px; text-transform: uppercase;">Tamaño</div>
       <div id="tamanoSelector" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;"></div>
     </div>
@@ -744,10 +1092,6 @@ header {
     <div style="margin-bottom: 12px;">
       <div style="font-size: 11px; font-weight: 600; color: #6a6a68; margin-bottom: 6px; text-transform: uppercase;">Color</div>
       <div id="colorTextoSelector" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;"></div>
-    </div>
-    
-    <div style="margin-bottom: 12px;">
-      <button id="btnToggleBold" class="panel-btn" style="width: 100%;">Bold / Normal</button>
     </div>
   </div>
 </div>
@@ -761,7 +1105,7 @@ header {
     </div>
     <div style="padding: 20px;">
       <h3 style="font-size: 14px; font-weight: 600; color: #6a6a68; margin-bottom: 12px; text-transform: uppercase;">Color de Fondo</h3>
-      <div id="fondoSelector" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px;"></div>
+      <div id="fondoSelector" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 24px; auto-rows: 1fr; max-width: 180px;"></div>
       
       <h3 style="font-size: 14px; font-weight: 600; color: #6a6a68; margin-bottom: 12px; text-transform: uppercase;">Partículas</h3>
       <div id="particulasSelector" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;"></div>
@@ -798,7 +1142,11 @@ const UNIDADES = ['A'];
 const TEMAS_POR_UNIDAD = 1;
 const BORDER_STYLES = [
   'borde-simple', 'borde-punteado', 'borde-doble', 'borde-grosor',
-  'borde-color-a', 'borde-color-b', 'borde-color-c', 'borde-gradient'
+  'borde-abecedario', 'borde-verbos', 'borde-colores', 'borde-terreno',
+  'borde-gastronomia', 'borde-invierno', 'borde-actividades', 'borde-estaciones',
+  'borde-imperativo', 'borde-subjuntivo', 'borde-preguntas', 'borde-frases', 'borde-negacion', 'borde-condicional', 'borde-accion',
+  'borde-caso1', 'borde-caso2', 'borde-caso3', 'borde-caso4', 'borde-caso5', 'borde-caso6',
+  'borde-tiempo0', 'borde-tiempo1', 'borde-tiempo2', 'borde-tiempo3', 'borde-tiempo4', 'borde-tiempo5', 'borde-tiempo6', 'borde-tiempo7'
 ];
 
 // ===== STATE =====
@@ -1408,13 +1756,41 @@ function renderSelectorEstilos() {
     btn.style.borderRadius = '4px';
     btn.style.border = '1px solid #d4d4d2';
     btn.style.background = '#f5f5f3';
+    btn.style.color = '#2a2a2a';
     btn.style.cursor = 'pointer';
     btn.style.transition = 'all 0.2s';
     
     btn.addEventListener('click', () => {
+      // Guardar referencia de qué celda estaba editándose
+      const celdaActiva = state.celdaSeleccionada;
+      
       aplicarEstiloACelda({ fontSize: tam });
+      
+      // NO redibujamos todo, solo actualizamos el tamaño en el DOM
+      if (celdaActiva) {
+        const { tarjetaId, fila, col: colCell, esTitle } = celdaActiva;
+        const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
+        
+        if (tarjeta) {
+          if (esTitle) {
+            const titleEl = document.querySelector(`.card[data-id="${tarjetaId}"] .card-title`);
+            if (titleEl) {
+              titleEl.style.fontSize = tam + 'px';
+              titleEl.focus();
+              titleEl.contentEditable = 'true';
+            }
+          } else {
+            const cellEl = document.querySelector(`.card[data-id="${tarjetaId}"] [data-fila="${fila}"][data-col="${colCell}"]`);
+            if (cellEl) {
+              cellEl.style.fontSize = tam + 'px';
+              cellEl.focus();
+              cellEl.contentEditable = 'true';
+            }
+          }
+        }
+      }
+      
       renderSelectorEstilos();
-      renderCards();
     });
     
     tamanoSelector.appendChild(btn);
@@ -1436,21 +1812,82 @@ function renderSelectorEstilos() {
     btn.title = col.nombre;
     
     btn.addEventListener('click', () => {
+      // Guardar referencia de qué celda estaba editándose
+      const celdaActiva = state.celdaSeleccionada;
+      
       aplicarEstiloACelda({ color: col.valor });
+      
+      // NO redibujamos todo, solo actualizamos el color en el DOM
+      if (celdaActiva) {
+        const { tarjetaId, fila, col: colCell, esTitle } = celdaActiva;
+        const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
+        
+        if (tarjeta) {
+          if (esTitle) {
+            const titleEl = document.querySelector(`.card[data-id="${tarjetaId}"] .card-title`);
+            if (titleEl) {
+              titleEl.style.color = col.valor;
+              titleEl.focus();
+              titleEl.contentEditable = 'true';
+            }
+          } else {
+            const cellEl = document.querySelector(`.card[data-id="${tarjetaId}"] [data-fila="${fila}"][data-col="${colCell}"]`);
+            if (cellEl) {
+              cellEl.style.color = col.valor;
+              cellEl.focus();
+              cellEl.contentEditable = 'true';
+            }
+          }
+        }
+      }
+      
       renderSelectorEstilos();
-      renderCards();
     });
     
     colorTextoSelector.appendChild(btn);
   });
   
-  // Bold toggle
-  const btnToggleBold = document.getElementById('btnToggleBold');
-  btnToggleBold.addEventListener('click', () => {
-    aplicarEstiloACelda({ bold: 'toggle' });
-    renderSelectorEstilos();
-    renderCards();
-  });
+}
+
+function aplicarBold(bold) {
+  if (!state.celdaSeleccionada) return;
+  
+  const { tarjetaId, fila, col, esTitle } = state.celdaSeleccionada;
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
+  
+  if (!tarjeta) return;
+  
+  // Si es el título
+  if (esTitle) {
+    if (typeof tarjeta.titulo !== 'object') {
+      tarjeta.titulo = {
+        texto: tarjeta.titulo || '',
+        fontSize: 10,
+        color: '#2A2A2A',
+        bold: false
+      };
+    }
+    tarjeta.titulo.bold = bold;
+  } else {
+    // Si es una celda normal
+    if (!tarjeta.contenido[fila] || !tarjeta.contenido[fila][col]) return;
+    
+    const cellData = tarjeta.contenido[fila][col];
+    
+    if (typeof cellData !== 'object') {
+      tarjeta.contenido[fila][col] = {
+        texto: cellData || '',
+        fontSize: 8,
+        color: '#2A2A2A',
+        bold: false
+      };
+    }
+    tarjeta.contenido[fila][col].bold = bold;
+  }
+  
+  saveToStorage();
+  renderSelectorEstilos();
+  renderCards();
 }
 
 function aplicarEstiloACelda(estilos) {
@@ -1515,50 +1952,51 @@ function aplicarEstiloACelda(estilos) {
 }
 
 function renderFondo() {
-  const colores = [
-    { name: 'Beige', value: '#f0ebe5' },
-    { name: 'Gris claro', value: '#e9e9e7' },
-    { name: 'Blanco', value: '#ffffff' },
-    { name: 'Azul cielo', value: '#e6f0ff' },
-    { name: 'Verde menta', value: '#e6ffe6' },
-    { name: 'Rosa suave', value: '#ffe6f0' },
-    { name: 'Amarillo pastel', value: '#fffbe6' },
-    { name: 'Naranja suave', value: '#ffe6cc' },
-    { name: 'Gris oscuro', value: '#d0d0ce' },
-    { name: 'Azul oscuro', value: '#1e3a8a' }
-  ];
-  
   const fondoSelector = document.getElementById('fondoSelector');
   fondoSelector.innerHTML = '';
   
-  colores.forEach(color => {
-    const btn = document.createElement('button');
-    btn.style.width = '100%';
-    btn.style.height = '50px';
-    btn.style.borderRadius = '4px';
-    btn.style.border = '1px solid #d4d4d2';
-    btn.style.background = color.value;
-    btn.style.cursor = 'pointer';
-    btn.style.transition = 'all 0.2s';
-    btn.title = color.name;
-    
-    btn.addEventListener('mouseenter', () => {
-      btn.style.border = '2px solid #000000';
-    });
-    
-    btn.addEventListener('mouseleave', () => {
-      btn.style.border = '1px solid #d4d4d2';
-    });
-    
-    btn.addEventListener('click', () => {
-      state.datos[state.unidadActual][state.temaActual].fondo = color.value;
-      saveToStorage();
-      renderCards();
-      cerrarModalFondo();
-    });
-    
-    fondoSelector.appendChild(btn);
+  // Crear un contenedor para el color picker
+  const container = document.createElement('div');
+  container.style.display = 'flex';
+  container.style.alignItems = 'center';
+  container.style.gap = '12px';
+  
+  // Label
+  const label = document.createElement('span');
+  label.textContent = 'Seleccionar color:';
+  label.style.fontSize = '12px';
+  label.style.color = '#2a2a2a';
+  label.style.fontWeight = '600';
+  
+  // Input de color
+  const colorInput = document.createElement('input');
+  colorInput.type = 'color';
+  colorInput.value = state.datos[state.unidadActual][state.temaActual]?.fondo || '#f0ebe5';
+  colorInput.style.width = '60px';
+  colorInput.style.height = '40px';
+  colorInput.style.border = '2px solid #c4956b';
+  colorInput.style.borderRadius = '6px';
+  colorInput.style.cursor = 'pointer';
+  colorInput.style.padding = '2px';
+  
+  colorInput.addEventListener('change', (e) => {
+    const color = e.target.value;
+    document.documentElement.style.setProperty('--bg-app', color);
+    state.datos[state.unidadActual][state.temaActual].fondo = color;
+    saveToStorage();
+    renderCards();
+    cerrarModalFondo();
   });
+  
+  // Para preview en tiempo real mientras draggea
+  colorInput.addEventListener('input', (e) => {
+    document.documentElement.style.setProperty('--bg-app', e.target.value);
+  });
+  
+  container.appendChild(label);
+  container.appendChild(colorInput);
+  fondoSelector.appendChild(container);
+  
   renderParticulas();
 }
 
@@ -1651,7 +2089,7 @@ function renderCards() {
   // Aplicar fondo del tema
   const tema = state.datos[state.unidadActual][state.temaActual];
   if (tema?.fondo) {
-    mesa.style.backgroundColor = tema.fondo;
+    document.documentElement.style.setProperty('--bg-app', tema.fondo);
   }
   
   // Manejar partículas
@@ -1825,9 +2263,24 @@ function renderCards() {
           if (e.key === 'Tab') {
             e.preventDefault();
             const nextCol = col + 1;
+            const nextFila = fila + 1;
+            
             if (nextCol < card.cols) {
-              const nextCell = grid.querySelector(`[data-fila="${fila}"][data-col="${nextCol}"]`);
-              if (nextCell) nextCell.focus();
+              // Siguiente celda en la misma fila
+              const nextCell = cardEl.querySelector(`[data-fila="${fila}"][data-col="${nextCol}"]`);
+              if (nextCell) {
+                nextCell.contentEditable = 'true';
+                nextCell.focus();
+                state.celdaSeleccionada = { tarjetaId: card.id, fila, col: nextCol };
+              }
+            } else if (nextFila < numFilas) {
+              // Saltar a primera celda de siguiente fila
+              const nextCell = cardEl.querySelector(`[data-fila="${nextFila}"][data-col="0"]`);
+              if (nextCell) {
+                nextCell.contentEditable = 'true';
+                nextCell.focus();
+                state.celdaSeleccionada = { tarjetaId: card.id, fila: nextFila, col: 0 };
+              }
             }
           } else if (e.key === 'Enter') {
             e.preventDefault();
@@ -2070,8 +2523,8 @@ function updateColsButtons() {
 }
 
 function updateAplicarButtons() {
-  document.getElementById('btnAplicarUna').classList.toggle('active', state.aplicarA === 'una');
-  document.getElementById('btnAplicarTodas').classList.toggle('active', state.aplicarA === 'todas');
+  document.getElementById('btnAplicarUna').classList.toggle('active-arena', state.aplicarA === 'una');
+  document.getElementById('btnAplicarTodas').classList.toggle('active-arena', state.aplicarA === 'todas');
 }
 
 // ===== STORAGE =====
@@ -2124,7 +2577,7 @@ class ParticleSystem {
     };
     
     particle.element.style.cssText = `
-      position: fixed;
+      position: absolute;
       pointer-events: none;
       border-radius: 50%;
       box-shadow: 0 0 8px ${color};
@@ -2166,7 +2619,7 @@ class ParticleSystem {
     this.active = true;
     this.particles.forEach(p => {
       if (!p.element.parentElement) {
-        document.body.appendChild(p.element);
+        this.container.appendChild(p.element);
       }
     });
   }
