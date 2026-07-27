@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>Cuaderno</title>
 
 <style>
@@ -32,7 +32,7 @@
   --card-border-w: 2.5px;
   --card-bg: #ffffff;
   
-  --font: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  --font: 'Quicksand', 'Nunito', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
 }
 
 html, body {
@@ -2274,6 +2274,63 @@ function renderCards() {
             };
           }
           saveToStorage();
+        });
+        
+        // Evento PASTE inteligente - detecta TABs y ENTERs
+        cell.addEventListener('paste', (e) => {
+          e.preventDefault();
+          
+          // Obtener texto del portapapeles
+          const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+          
+          // Detectar si tiene TABs o ENTERs (estructura de tabla)
+          const hasTabsOrEnters = /\t|\n/.test(pastedText);
+          
+          if (hasTabsOrEnters) {
+            // Parsear como tabla
+            const filas = pastedText.split('\n').filter(f => f.trim() !== '');
+            const datos = filas.map(fila => fila.split('\t'));
+            
+            // Llenar desde la celda actual hacia adelante
+            datos.forEach((fila_data, fila_offset) => {
+              const targetFila = fila + fila_offset;
+              
+              // Verificar que no se salga del rango de filas
+              if (targetFila >= numFilas) return;
+              
+              fila_data.forEach((celda_data, col_offset) => {
+                const targetCol = col + col_offset;
+                
+                // Verificar que no se salga del rango de columnas
+                if (targetCol >= card.cols) return;
+                
+                // Obtener la celda destino
+                const targetCell = cardEl.querySelector(`[data-fila="${targetFila}"][data-col="${targetCol}"]`);
+                
+                if (targetCell) {
+                  // Guardar en state.datos
+                  if (!card.contenido[targetFila]) card.contenido[targetFila] = [];
+                  
+                  card.contenido[targetFila][targetCol] = {
+                    texto: celda_data.trim(),
+                    fontSize: 8,
+                    color: '#2A2A2A',
+                    bold: false
+                  };
+                  
+                  // Actualizar visualmente
+                  targetCell.innerHTML = celda_data.trim();
+                }
+              });
+            });
+            
+            saveToStorage();
+            renderSelectorEstilos();
+            renderCards();
+          } else {
+            // Si no tiene estructura, pegá normalmente en la celda
+            cell.innerHTML += pastedText;
+          }
         });
         
         cell.addEventListener('keydown', (e) => {
