@@ -447,7 +447,7 @@ header {
 /* Contenedor de columnas */
 .card-grid {
   display: grid;
-  gap: 0px 8px;
+  gap: 0px 0px;
   width: 100%;
 }
 
@@ -491,11 +491,13 @@ header {
   border: none;
   border-bottom: 0.3px dotted #e0e0de;
   border-radius: 0;
-  padding: 8px 12px 2px 12px;
-  margin-right: 12px;
+  padding: 8px 0px 2px 0px;
+  margin: 0;
+  margin-right: 8px;
   font-size: 12px;
   color: #2a2a28;
   min-height: 20px;
+  min-width: 27px;
   display: block;
   text-align: left;
   word-break: break-word;
@@ -505,12 +507,7 @@ header {
   cursor: text;
   transition: all 0.15s;
   line-height: 1.4;
-  max-width: 375px;
   overflow: hidden;
-}
-
-.cell:nth-child(2n) {
-  margin-right: 0px;
 }
 
 .cell:hover {
@@ -533,7 +530,7 @@ header {
 
 .card-grid {
   display: grid;
-  gap: 0px 8px;
+  gap: 0px 0px;
   width: 100%;
   grid-auto-columns: auto;
   max-width: 100%;
@@ -879,6 +876,7 @@ header {
   </div>
   
   <div class="header-right">
+    <button class="btn" id="btnDeshacer" title="Deshacer (Ctrl+Z)" style="opacity: 0.5;" disabled>↶</button>
     <button class="btn" id="btnEditarEstructura" title="Editar estructura">A</button>
     <button class="btn" id="btnModoVoz" title="Modo Voz">S</button>
     <button class="btn" id="btnEditarFondo" title="Editar fondo">P</button>
@@ -1066,6 +1064,14 @@ header {
     <button class="panel-btn" id="btnBorrarTarjeta" style="width: 100%; background: #ffe6e6; border-color: #e24b4a; color: #a32d2d;">Borrar tarjeta</button>
   </div>
   
+  <div class="panel-section" id="seccionDuplicar" style="display: none;">
+    <button class="panel-btn" id="btnDuplicarTarjeta" style="width: 100%; background: #e6f0ff; border-color: #1E3A8A; color: #1E3A8A;">Duplicar tarjeta</button>
+  </div>
+  
+  <div class="panel-section" id="seccionVaciar" style="display: none;">
+    <button class="panel-btn" id="btnVaciarTarjeta" style="width: 100%; background: #fff0e6; border-color: #d97706; color: #d97706;">Vaciar contenido</button>
+  </div>
+  
   <div class="panel-section" id="seccionConfirmar" style="display: none;">
     <div style="font-size: 12px; color: #6a6a68; margin-bottom: 8px; text-align: center;">¿Estás seguro?</div>
     <div class="panel-buttons">
@@ -1180,8 +1186,47 @@ let state = {
   aplicarA: 'una', // 'una' o 'todas'
   
   // Datos: { [unidad]: { [tema]: [ { id, x, y, scale, borde, cols, contenido: [[], [], ...] } ] } }
-  datos: {}
+  datos: {},
+  
+  // Historial para undo
+  historial: [],
+  indexHistorial: -1
 };
+
+// Función para guardar en historial
+function guardarEnHistorial() {
+  // Limitar historial a últimos 20 cambios
+  if (state.indexHistorial < state.historial.length - 1) {
+    state.historial = state.historial.slice(0, state.indexHistorial + 1);
+  }
+  state.historial.push(JSON.parse(JSON.stringify(state.datos)));
+  state.indexHistorial++;
+  if (state.historial.length > 20) {
+    state.historial.shift();
+    state.indexHistorial--;
+  }
+  actualizarBotonUndo();
+}
+
+// Función para deshacer
+function deshacer() {
+  if (state.indexHistorial > 0) {
+    state.indexHistorial--;
+    state.datos = JSON.parse(JSON.stringify(state.historial[state.indexHistorial]));
+    saveToStorage();
+    renderCards();
+    actualizarBotonUndo();
+  }
+}
+
+// Actualizar estado del botón undo
+function actualizarBotonUndo() {
+  const btnUndo = document.getElementById('btnDeshacer');
+  if (btnUndo) {
+    btnUndo.disabled = state.indexHistorial <= 0;
+    btnUndo.style.opacity = state.indexHistorial <= 0 ? '0.5' : '1';
+  }
+}
 
 // ===== INIT =====
 function init() {
@@ -1219,6 +1264,7 @@ function setupEventListeners() {
   // Botones
   document.getElementById('btnAddCard').addEventListener('click', addCard);
   document.getElementById('btnToggleEditor').addEventListener('click', toggleEditor);
+  document.getElementById('btnDeshacer').addEventListener('click', deshacer);
   document.getElementById('btnEditarEstructura').addEventListener('click', abrirModalEstructura);
   document.getElementById('btnEditarFondo').addEventListener('click', abrirModalFondo);
   document.getElementById('btnDescargar').addEventListener('click', descargarBackup);
@@ -1245,7 +1291,20 @@ function setupEventListeners() {
     const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card) {
-      card.contenido.push(new Array(card.cols).fill(''));
+      // Insertar DESPUÉS de la fila seleccionada
+      let posicion = card.contenido.length; // Por defecto al final
+      if (state.celdaSeleccionada && state.celdaSeleccionada.tarjetaId === card.id) {
+        posicion = state.celdaSeleccionada.fila + 1;
+      }
+      
+      const newRow = new Array(card.cols).fill(null).map(() => ({ 
+        texto: '', 
+        fontSize: 8, 
+        color: '#2A2A2A', 
+        bold: false, 
+        textAlign: 'left' 
+      }));
+      card.contenido.splice(posicion, 0, newRow);
       renderCards();
       saveToStorage();
     }
@@ -1256,7 +1315,13 @@ function setupEventListeners() {
     const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card && card.contenido.length > 1) {
-      card.contenido.pop();
+      // Borrar la fila seleccionada
+      let filaBorrar = card.contenido.length - 1; // Por defecto la última
+      if (state.celdaSeleccionada && state.celdaSeleccionada.tarjetaId === card.id) {
+        filaBorrar = state.celdaSeleccionada.fila;
+      }
+      
+      card.contenido.splice(filaBorrar, 1);
       renderCards();
       saveToStorage();
     }
@@ -1267,8 +1332,22 @@ function setupEventListeners() {
     const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card) {
+      // Insertar DESPUÉS de la columna seleccionada
+      let posicion = card.cols; // Por defecto al final
+      if (state.celdaSeleccionada && state.celdaSeleccionada.tarjetaId === card.id) {
+        posicion = state.celdaSeleccionada.col + 1;
+      }
+      
       card.cols++;
-      card.contenido.forEach(row => row.push(''));
+      card.contenido.forEach(row => {
+        row.splice(posicion, 0, { 
+          texto: '', 
+          fontSize: 8, 
+          color: '#2A2A2A', 
+          bold: false, 
+          textAlign: 'left' 
+        });
+      });
       renderCards();
       saveToStorage();
     }
@@ -1279,8 +1358,14 @@ function setupEventListeners() {
     const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card && card.cols > 1) {
+      // Borrar la columna seleccionada
+      let colBorrar = card.cols - 1; // Por defecto la última
+      if (state.celdaSeleccionada && state.celdaSeleccionada.tarjetaId === card.id) {
+        colBorrar = state.celdaSeleccionada.col;
+      }
+      
       card.cols--;
-      card.contenido.forEach(row => row.pop());
+      card.contenido.forEach(row => row.splice(colBorrar, 1));
       renderCards();
       saveToStorage();
     }
@@ -1289,6 +1374,48 @@ function setupEventListeners() {
   document.getElementById('btnBorrarTarjeta').addEventListener('click', () => {
     document.getElementById('seccionBorrar').style.display = 'none';
     document.getElementById('seccionConfirmar').style.display = 'block';
+  });
+  
+  document.getElementById('btnDuplicarTarjeta').addEventListener('click', () => {
+    if (!state.tarjetaSeleccionada) return;
+    
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const idx = tarjetas.findIndex(c => c.id === state.tarjetaSeleccionada);
+    
+    if (idx !== -1) {
+      const original = tarjetas[idx];
+      const clon = JSON.parse(JSON.stringify(original));
+      clon.id = Date.now();
+      clon.x = original.x + 30;
+      clon.y = original.y + 30;
+      
+      tarjetas.push(clon);
+      state.tarjetaSeleccionada = clon.id;
+      
+      saveToStorage();
+      renderCards();
+    }
+  });
+  
+  document.getElementById('btnVaciarTarjeta').addEventListener('click', () => {
+    if (!state.tarjetaSeleccionada) return;
+    
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
+    
+    if (card) {
+      // Vaciar SOLO el texto, conservar estructura y estilos
+      card.contenido.forEach(fila => {
+        fila.forEach(celda => {
+          if (typeof celda === 'object') {
+            celda.texto = '';
+          }
+        });
+      });
+      
+      saveToStorage();
+      renderCards();
+    }
   });
   
   document.getElementById('btnConfirmarBorrar').addEventListener('click', () => {
@@ -1300,6 +1427,8 @@ function setupEventListeners() {
       state.tarjetaSeleccionada = null;
       document.getElementById('seccionGridAbierta').style.display = 'none';
       document.getElementById('seccionBorrar').style.display = 'none';
+      document.getElementById('seccionDuplicar').style.display = 'none';
+      document.getElementById('seccionVaciar').style.display = 'none';
       document.getElementById('seccionConfirmar').style.display = 'none';
       document.getElementById('seccionEscala').style.display = 'none';
       renderCards();
@@ -1357,6 +1486,14 @@ function setupEventListeners() {
   document.addEventListener('pointermove', onPointerMove);
   document.addEventListener('pointerup', onPointerUp);
   document.addEventListener('pointercancel', onPointerUp);
+  
+  // Ctrl+Z para deshacer
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+      e.preventDefault();
+      deshacer();
+    }
+  });
 }
 
 // ===== MODAL EDITAR ESTRUCTURA =====
@@ -2288,6 +2425,10 @@ function renderCards() {
   // Ocultar sección si no hay tarjeta seleccionada
   if (!state.tarjetaSeleccionada) {
     document.getElementById('seccionGridAbierta').style.display = 'none';
+    document.getElementById('seccionBorrar').style.display = 'none';
+    document.getElementById('seccionDuplicar').style.display = 'none';
+    document.getElementById('seccionVaciar').style.display = 'none';
+    document.getElementById('seccionEscala').style.display = 'none';
   }
   
   tarjetas.forEach(card => {
@@ -2469,14 +2610,22 @@ function renderCards() {
                 const targetCell = cardEl.querySelector(`[data-fila="${targetFila}"][data-col="${targetCol}"]`);
                 
                 if (targetCell) {
-                  // Guardar en state.datos
+                  // Obtener el ESTILO DE LA CELDA DESTINO (no donde se pegó)
+                  const destCell = card.contenido[targetFila][targetCol];
+                  const fontSize = (typeof destCell === 'object') ? destCell.fontSize : 8;
+                  const color = (typeof destCell === 'object') ? destCell.color : '#2A2A2A';
+                  const bold = (typeof destCell === 'object') ? destCell.bold : false;
+                  const textAlign = (typeof destCell === 'object') ? destCell.textAlign : 'left';
+                  
+                  // Guardar en state.datos CON EL ESTILO DE LA CELDA DESTINO
                   if (!card.contenido[targetFila]) card.contenido[targetFila] = [];
                   
                   card.contenido[targetFila][targetCol] = {
                     texto: celda_data.trim(),
-                    fontSize: 8,
-                    color: '#2A2A2A',
-                    bold: false
+                    fontSize: fontSize,
+                    color: color,
+                    bold: bold,
+                    textAlign: textAlign
                   };
                   
                   // Actualizar visualmente
@@ -2592,6 +2741,8 @@ function selectCard(id) {
     updateColsButtons();
     document.getElementById('seccionGridAbierta').style.display = 'block';
     document.getElementById('seccionBorrar').style.display = 'block';
+    document.getElementById('seccionDuplicar').style.display = 'block';
+    document.getElementById('seccionVaciar').style.display = 'block';
     document.getElementById('seccionEscala').style.display = 'block';
     // Actualizar slider
     document.getElementById('sliderEscala').value = tarjeta.scale;
@@ -2794,6 +2945,9 @@ function updateAplicarButtons() {
 
 // ===== STORAGE =====
 function saveToStorage() {
+  // Guardar en historial ANTES de persistir
+  guardarEnHistorial();
+  // Guardar en localStorage
   localStorage.setItem('cuaderno-state', JSON.stringify(state.datos));
 }
 
@@ -2802,6 +2956,9 @@ function loadFromStorage() {
   if (saved) {
     state.datos = JSON.parse(saved);
   }
+  // Inicializar historial con el estado actual
+  state.historial = [JSON.parse(JSON.stringify(state.datos))];
+  state.indexHistorial = 0;
 }
 
 // ===== PARTICLE SYSTEM =====
