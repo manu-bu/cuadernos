@@ -1520,8 +1520,11 @@ function renderEstructura() {
     item.className = `estructura-item ${unidad === unidadSeleccionadaModal ? 'seleccionado' : ''}`;
     item.dataset.unidad = unidad;
     
+    // Obtener nombre guardado o default
+    const nombreUnidad = state.datos[unidad]?._nombre || ('Unidad ' + unidad);
+    
     item.innerHTML = `
-      <span class="estructura-nombre" contenteditable="false" data-unidad="${unidad}" data-type="unidad">Unidad ${unidad}</span>
+      <span class="estructura-nombre" contenteditable="false" data-unidad="${unidad}" data-type="unidad">${nombreUnidad}</span>
       <div class="estructura-botones">
         <button class="btn-mini-modal agregar" title="Agregar unidad" data-action="agregarUnidad" data-unidad="${unidad}">+</button>
         <button class="btn-mini-modal borrar" title="Borrar unidad" data-action="borrar" data-unidad="${unidad}">−</button>
