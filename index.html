@@ -1094,17 +1094,17 @@ header {
     <div style="margin-bottom: 12px;">
       <div style="font-size: 11px; font-weight: 600; color: #6a6a68; margin-bottom: 6px; text-transform: uppercase;">Peso</div>
       <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
-        <button class="panel-btn" onclick="aplicarBold(true)" style="font-weight: 700;">Bold</button>
-        <button class="panel-btn" onclick="aplicarBold(false)">Normal</button>
+        <button class="panel-btn" id="btnBoldOn" onclick="aplicarBold(true)" style="font-weight: 700;">Bold</button>
+        <button class="panel-btn" id="btnBoldOff" onclick="aplicarBold(false)">Normal</button>
       </div>
     </div>
     
     <div style="margin-bottom: 12px;">
       <div style="font-size: 11px; font-weight: 600; color: #6a6a68; margin-bottom: 6px; text-transform: uppercase;">Alineación</div>
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
-        <button class="panel-btn" onclick="aplicarAlineacion('left')">⬅ Izq</button>
-        <button class="panel-btn" onclick="aplicarAlineacion('center')">⬆ Centro</button>
-        <button class="panel-btn" onclick="aplicarAlineacion('right')">Der ➡</button>
+        <button class="panel-btn" id="btnAlignLeft" onclick="aplicarAlineacion('left')">⬅ Izq</button>
+        <button class="panel-btn" id="btnAlignCenter" onclick="aplicarAlineacion('center')">⬆ Centro</button>
+        <button class="panel-btn" id="btnAlignRight" onclick="aplicarAlineacion('right')">Der ➡</button>
       </div>
     </div>
     
@@ -1898,6 +1898,50 @@ function toggleModoVoz() {
 
 // ===== ESTILOS DE CELDA =====
 function renderSelectorEstilos() {
+  if (!state.celdaSeleccionada) return;
+  
+  const { tarjetaId, fila, col, esTitle } = state.celdaSeleccionada;
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
+  
+  if (!tarjeta) return;
+  
+  let celda;
+  if (esTitle) {
+    celda = typeof tarjeta.titulo === 'object' ? tarjeta.titulo : { fontSize: 10, bold: false, textAlign: 'left', color: '#2A2A2A' };
+  } else {
+    if (!tarjeta.contenido[fila] || !tarjeta.contenido[fila][col]) return;
+    celda = tarjeta.contenido[fila][col];
+  }
+  
+  const fontSize = celda.fontSize || 8;
+  const bold = celda.bold || false;
+  const textAlign = celda.textAlign || 'left';
+  const color = celda.color || '#2A2A2A';
+  
+  // Marcar botones de Bold
+  const btnBoldOn = document.getElementById('btnBoldOn');
+  const btnBoldOff = document.getElementById('btnBoldOff');
+  if (btnBoldOn && btnBoldOff) {
+    if (bold) {
+      btnBoldOn.style.border = '2px solid #88cc00';
+      btnBoldOff.style.border = '1px solid #d4d4d2';
+    } else {
+      btnBoldOn.style.border = '1px solid #d4d4d2';
+      btnBoldOff.style.border = '2px solid #88cc00';
+    }
+  }
+  
+  // Marcar botones de Alineación
+  const btnAlignLeft = document.getElementById('btnAlignLeft');
+  const btnAlignCenter = document.getElementById('btnAlignCenter');
+  const btnAlignRight = document.getElementById('btnAlignRight');
+  
+  [btnAlignLeft, btnAlignCenter, btnAlignRight].forEach(btn => btn.style.border = '1px solid #d4d4d2');
+  
+  if (textAlign === 'left') btnAlignLeft.style.border = '2px solid #88cc00';
+  else if (textAlign === 'center') btnAlignCenter.style.border = '2px solid #88cc00';
+  else if (textAlign === 'right') btnAlignRight.style.border = '2px solid #88cc00';
+  
   // Tamaños
   const tamaños = [4, 6, 8, 10, 12, 14, 16, 18];
   const tamanoSelector = document.getElementById('tamanoSelector');
@@ -1909,19 +1953,16 @@ function renderSelectorEstilos() {
     btn.style.fontSize = '12px';
     btn.style.padding = '8px 4px';
     btn.style.borderRadius = '4px';
-    btn.style.border = '1px solid #d4d4d2';
+    btn.style.border = fontSize === tam ? '2px solid #88cc00' : '1px solid #d4d4d2';
     btn.style.background = '#f5f5f3';
     btn.style.color = '#2a2a2a';
     btn.style.cursor = 'pointer';
     btn.style.transition = 'all 0.2s';
     
     btn.addEventListener('click', () => {
-      // Guardar referencia de qué celda estaba editándose
       const celdaActiva = state.celdaSeleccionada;
-      
       aplicarEstiloACelda({ fontSize: tam });
       
-      // NO redibujamos todo, solo actualizamos el tamaño en el DOM
       if (celdaActiva) {
         const { tarjetaId, fila, col: colCell, esTitle } = celdaActiva;
         const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
@@ -1960,19 +2001,16 @@ function renderSelectorEstilos() {
     btn.style.width = '100%';
     btn.style.height = '30px';
     btn.style.borderRadius = '4px';
-    btn.style.border = '1px solid #d4d4d2';
+    btn.style.border = color === col.valor ? '3px solid #000' : '1px solid #d4d4d2';
     btn.style.background = col.valor;
     btn.style.cursor = 'pointer';
     btn.style.transition = 'all 0.2s';
     btn.title = col.nombre;
     
     btn.addEventListener('click', () => {
-      // Guardar referencia de qué celda estaba editándose
       const celdaActiva = state.celdaSeleccionada;
-      
       aplicarEstiloACelda({ color: col.valor });
       
-      // NO redibujamos todo, solo actualizamos el color en el DOM
       if (celdaActiva) {
         const { tarjetaId, fila, col: colCell, esTitle } = celdaActiva;
         const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
@@ -2001,7 +2039,6 @@ function renderSelectorEstilos() {
     
     colorTextoSelector.appendChild(btn);
   });
-  
 }
 
 function aplicarBold(bold) {
@@ -2060,6 +2097,50 @@ function aplicarBold(bold) {
   }
   
   renderSelectorEstilos();
+}
+
+function actualizarPreview() {
+  if (!state.celdaSeleccionada) return;
+  
+  const { tarjetaId, fila, col, esTitle } = state.celdaSeleccionada;
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
+  
+  if (!tarjeta) return;
+  
+  let celda;
+  if (esTitle) {
+    celda = typeof tarjeta.titulo === 'object' ? tarjeta.titulo : { fontSize: 10, bold: false, textAlign: 'left', color: '#2A2A2A' };
+  } else {
+    if (!tarjeta.contenido[fila] || !tarjeta.contenido[fila][col]) return;
+    celda = tarjeta.contenido[fila][col];
+  }
+  
+  const fontSize = celda.fontSize || 8;
+  const bold = celda.bold || false;
+  const textAlign = celda.textAlign || 'left';
+  const color = celda.color || '#2A2A2A';
+  
+  // Actualizar preview visual
+  const previewEl = document.getElementById('previewEstilos');
+  if (previewEl) {
+    previewEl.style.fontSize = fontSize + 'px';
+    previewEl.style.fontWeight = bold ? '700' : '400';
+    previewEl.style.textAlign = textAlign;
+    previewEl.style.color = color;
+  }
+  
+  // Actualizar textos informativos
+  document.getElementById('previewTexto').textContent = 'Tamaño: ' + fontSize + 'px';
+  document.getElementById('previewPeso').textContent = 'Peso: ' + (bold ? 'Bold' : 'Normal');
+  
+  const alineacionTexto = textAlign === 'left' ? 'Izquierda' : textAlign === 'center' ? 'Centro' : 'Derecha';
+  document.getElementById('previewAlineacion').textContent = 'Alineación: ' + alineacionTexto;
+  
+  // Actualizar color
+  const colorSpan = document.querySelector('#previewColor span');
+  if (colorSpan) {
+    colorSpan.style.background = color;
+  }
 }
 
 function aplicarAlineacion(alineacion) {
