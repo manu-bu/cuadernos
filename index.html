@@ -1237,9 +1237,14 @@ function init() {
 
 function initData() {
   UNIDADES.forEach(u => {
-    state.datos[u] = {};
+    state.datos[u] = {
+      _nombre: 'Unidad ' + u  // Agregar nombre default de unidad
+    };
     for (let i = 1; i <= TEMAS_POR_UNIDAD; i++) {
-      state.datos[u][i] = [];
+      state.datos[u][i] = {
+        _nombre: 'Tema ' + i,  // Agregar nombre default de tema
+        tarjetas: []
+      };
     }
   });
   loadFromStorage();
