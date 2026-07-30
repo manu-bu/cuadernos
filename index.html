@@ -1660,8 +1660,20 @@ function renderEstructura() {
 }
 
 function editarNombreUnidad(unidad) {
-  console.log('Editar unidad:', unidad);
-  // TODO: implementar
+  const nombreActual = state.datos[unidad]?._nombre || ('Unidad ' + unidad);
+  const nuevoNombre = prompt('Nuevo nombre para la unidad:', nombreActual);
+  
+  if (nuevoNombre !== null && nuevoNombre.trim() !== '') {
+    state.datos[unidad]._nombre = nuevoNombre.trim();
+    
+    // Si es la unidad actual, actualizar el selector
+    if (unidad === state.unidadActual) {
+      actualizarSelectorUnidades();
+    }
+    
+    saveToStorage();
+    renderEstructura();
+  }
 }
 
 function actualizarSelectorTemas() {
@@ -1788,8 +1800,20 @@ function borrarUnidad(unidad) {
 }
 
 function editarNombreTema(unidad, tema) {
-  console.log('Editar tema:', unidad, tema);
-  // TODO: implementar
+  const nombreActual = state.datos[unidad][tema]?._nombre || ('Tema ' + tema);
+  const nuevoNombre = prompt('Nuevo nombre para el tema:', nombreActual);
+  
+  if (nuevoNombre !== null && nuevoNombre.trim() !== '') {
+    state.datos[unidad][tema]._nombre = nuevoNombre.trim();
+    
+    // Si es el tema actual, actualizar el selector
+    if (unidad === state.unidadActual) {
+      actualizarSelectorTemas();
+    }
+    
+    saveToStorage();
+    renderEstructura();
+  }
 }
 
 function agregarTema(unidad) {
