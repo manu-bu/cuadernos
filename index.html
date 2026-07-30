@@ -1730,8 +1730,13 @@ function agregarUnidad() {
   const letraNueva = String.fromCharCode(letraActual);
   
   // Crear nueva unidad con 1 tema
-  state.datos[letraNueva] = {};
-  state.datos[letraNueva][1] = [];
+  state.datos[letraNueva] = {
+    _nombre: 'Unidad ' + letraNueva
+  };
+  state.datos[letraNueva][1] = {
+    _nombre: 'Tema 1',
+    tarjetas: []
+  };
   
   // Actualizar selector de unidades
   const selUnidad = document.getElementById('selUnidad');
@@ -1755,10 +1760,15 @@ function agregarUnidad() {
 function agregarTemaEnUnidad(unidad) {
   if (!state.datos[unidad]) return;
   
-  const temasExistentes = Object.keys(state.datos[unidad]).map(Number);
+  const temasExistentes = Object.keys(state.datos[unidad])
+    .filter(k => k !== '_nombre')
+    .map(Number);
   const nuevoTemaNum = Math.max(...temasExistentes, 0) + 1;
   
-  state.datos[unidad][nuevoTemaNum] = [];
+  state.datos[unidad][nuevoTemaNum] = {
+    _nombre: 'Tema ' + nuevoTemaNum,
+    tarjetas: []
+  };
   
   // Actualizar selector si es la unidad actual
   if (unidad === state.unidadActual) {
