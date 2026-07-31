@@ -13,27 +13,17 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-@property --angulo-led {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-
-@keyframes girarLed {
-  to { --angulo-led: 360deg; }
-}
-
 :root {
   --w: 1366px;
   --h: 100dvh;
-  --header-h: 60px;
+  --header-h: 72px;
   
   --bg-app: #f0ebe5;
   --header-bg: #e5d5c3;
   --border-header: #c4956b;
   
-  --sel-h: 38px;
-  --sel-radius: 12px;
+  --sel-h: 44px;
+  --sel-radius: 22px;
   --sel-border: 3.5px;
   --sel-color: #d4b89f;
   
@@ -74,103 +64,19 @@ header {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
   flex: 1;
   min-width: 0;
-}
-
-.dropdown-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-btn {
-  height: var(--sel-h);
-  border-radius: var(--sel-radius);
-  border: none;
-  outline: none;
-  background: #3d2817;
-  padding: 0 16px;
-  font-size: 14px;
-  color: #e8e6de;
-  font-weight: 700;
-  font-family: var(--font);
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
-  text-transform: uppercase;
-  position: relative;
-}
-
-.dropdown-btn::before {
-  content: "";
-  position: absolute;
-  inset: -3px;
-  border-radius: calc(var(--sel-radius) + 3px);
-  background: conic-gradient(
-    from var(--angulo-led),
-    #f5d97a,
-    #e88787,
-    #f0a8d0,
-    #b79bdb,
-    #7ba7e0,
-    #a0e0f5,
-    #c4e86a,
-    #f5d97a
-  );
-  animation: girarLed 4s linear infinite;
-  z-index: -1;
-}
-
-.dropdown-btn::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: var(--sel-radius);
-  background: #3d2817;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  background: #3d2817;
-  border-radius: var(--sel-radius);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  min-width: 150px;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.dropdown-item {
-  padding: 12px 16px;
-  color: #e8e6de;
-  cursor: pointer;
-  transition: all 0.15s;
-  font-weight: 600;
-}
-
-.dropdown-item:hover {
-  background: #4a3520;
-}
-
-.dropdown-item.active {
-  background: #5a4530;
-  color: #f5d97a;
 }
 
 .selector {
   height: var(--sel-h);
   border-radius: var(--sel-radius);
-  border: none;
-  outline: none;
-  background: #3d2817;
+  border: var(--sel-border) solid #c4956b;
+  background: #ffffff;
   padding: 0 16px;
   font-size: 14px;
-  color: #e8e6de;
+  color: #2a2a2a;
   font-weight: 700;
   font-family: var(--font);
   cursor: pointer;
@@ -180,41 +86,6 @@ header {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-}
-
-.selector-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.selector-wrapper::before {
-  content: "";
-  position: absolute;
-  inset: -3px;
-  border-radius: calc(var(--sel-radius) + 3px);
-  background: conic-gradient(
-    from var(--angulo-led),
-    #f5d97a,
-    #e88787,
-    #f0a8d0,
-    #b79bdb,
-    #7ba7e0,
-    #a0e0f5,
-    #c4e86a,
-    #f5d97a
-  );
-  animation: girarLed 4s linear infinite;
-  z-index: -1;
-}
-
-.selector-wrapper::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: var(--sel-radius);
-  background: #3d2817;
-  z-index: -1;
-  pointer-events: none;
 }
 
 .selector:hover {
@@ -235,62 +106,31 @@ header {
 }
 
 .btn {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  border: none;
-  background: #3d2817;
+  border: var(--sel-border) solid #c4956b;
+  background: #ffffff;
   font-size: 18px;
   font-weight: 700;
   font-family: var(--font);
-  color: #e8e6de;
+  color: #2a2a2a;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s ease;
-  position: relative;
-}
-
-.btn::before {
-  content: "";
-  position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  background: conic-gradient(
-    from var(--angulo-led),
-    #f5d97a,
-    #e88787,
-    #f0a8d0,
-    #b79bdb,
-    #7ba7e0,
-    #a0e0f5,
-    #c4e86a,
-    #f5d97a
-  );
-  animation: girarLed 4s linear infinite;
-  z-index: -1;
-}
-
-.btn::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: #3d2817;
-  z-index: -1;
-}
-
-.btn:active {
-  transform: scale(0.93);
+  transition: all 0.15s;
 }
 
 .btn:hover {
-  /* LED effect visible, sin background que tape */
+  border-color: #a8795a;
+  background: #f9f9f7;
 }
 
 .btn.active {
-  /* LED effect visible, sin background que tape */
+  border-color: #88cc00;
+  background: #f0ff80;
+  box-shadow: 0 0 8px rgba(136, 204, 0, 0.4);
 }
 
 /* ===== EDITOR BORDES ===== */
@@ -303,8 +143,8 @@ header {
 }
 
 .borde-opcion {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   border: 2px solid #d4d4d2;
   background: #ffffff;
@@ -1027,21 +867,13 @@ header {
 <!-- ===== HEADER ===== -->
 <header>
   <div class="header-left">
-    <div class="dropdown-wrapper">
-      <button class="dropdown-btn" id="btnUnidadDropdown">Unidad A</button>
-      <div class="dropdown-menu" id="dropdownUnidad" style="display: none;">
-        <div class="dropdown-item" data-value="A">Unidad A</div>
-      </div>
-    </div>
+    <select id="selUnidad" class="selector">
+      <option value="A">Unidad A</option>
+    </select>
     
-    <div class="dropdown-wrapper">
-      <button class="dropdown-btn" id="btnTemaDropdown">Tema 1</button>
-      <div class="dropdown-menu" id="dropdownTema" style="display: none;">
-        <div class="dropdown-item" data-value="1">Tema 1</div>
-      </div>
-    </div>
-    
-    <button class="btn" id="btnToggleTools" title="Mostrar/Ocultar herramientas" style="font-size: 14px; font-weight: 700;">H</button>
+    <select id="selTema" class="selector">
+      <option value="1">Tema 1</option>
+    </select>
   </div>
   
   <div class="header-right">
@@ -1417,62 +1249,22 @@ function initData() {
     }
   });
   loadFromStorage();
-  actualizarSelectorUnidades();
 }
 
 function setupEventListeners() {
-  // ===== DROPDOWNS CUSTOM =====
-  const btnUnidadDropdown = document.getElementById('btnUnidadDropdown');
-  const dropdownUnidad = document.getElementById('dropdownUnidad');
-  const btnTemaDropdown = document.getElementById('btnTemaDropdown');
-  const dropdownTema = document.getElementById('dropdownTema');
-  
-  // Toggle dropdown unidad
-  btnUnidadDropdown.addEventListener('click', (e) => {
-    e.stopPropagation();
-    dropdownUnidad.style.display = dropdownUnidad.style.display === 'none' ? 'block' : 'none';
-    dropdownTema.style.display = 'none'; // Cerrar el otro
+  // Selectores
+  document.getElementById('selUnidad').addEventListener('change', (e) => {
+    state.unidadActual = e.target.value;
+    state.temaActual = Object.keys(state.datos[state.unidadActual])[0]; // Ir al primer tema de la nueva unidad
+    state.tarjetaSeleccionada = null;
+    actualizarSelectorTemas();
+    renderCards();
   });
   
-  // Toggle dropdown tema
-  btnTemaDropdown.addEventListener('click', (e) => {
-    e.stopPropagation();
-    dropdownTema.style.display = dropdownTema.style.display === 'none' ? 'block' : 'none';
-    dropdownUnidad.style.display = 'none'; // Cerrar el otro
-  });
-  
-  // Seleccionar unidad
-  dropdownUnidad.addEventListener('click', (e) => {
-    if (e.target.classList.contains('dropdown-item')) {
-      const value = e.target.dataset.value;
-      btnUnidadDropdown.textContent = e.target.textContent;
-      dropdownUnidad.style.display = 'none';
-      
-      state.unidadActual = value;
-      state.temaActual = Object.keys(state.datos[state.unidadActual]).find(k => k !== '_nombre');
-      state.tarjetaSeleccionada = null;
-      actualizarSelectorTemas();
-      renderCards();
-    }
-  });
-  
-  // Seleccionar tema
-  dropdownTema.addEventListener('click', (e) => {
-    if (e.target.classList.contains('dropdown-item')) {
-      const value = e.target.dataset.value;
-      btnTemaDropdown.textContent = e.target.textContent;
-      dropdownTema.style.display = 'none';
-      
-      state.temaActual = value;
-      state.tarjetaSeleccionada = null;
-      renderCards();
-    }
-  });
-  
-  // Cerrar dropdowns al clickear afuera
-  document.addEventListener('click', () => {
-    dropdownUnidad.style.display = 'none';
-    dropdownTema.style.display = 'none';
+  document.getElementById('selTema').addEventListener('change', (e) => {
+    state.temaActual = e.target.value;
+    state.tarjetaSeleccionada = null;
+    renderCards();
   });
   
   // Botones
@@ -1484,7 +1276,6 @@ function setupEventListeners() {
   document.getElementById('btnDescargar').addEventListener('click', descargarBackup);
   document.getElementById('btnCargar').addEventListener('click', cargarBackup);
   document.getElementById('btnModoVoz').addEventListener('click', toggleModoVoz);
-  document.getElementById('btnToggleTools').addEventListener('click', toggleToolsVisibility);
   document.getElementById('btnCerrarModalFondo').addEventListener('click', cerrarModalFondo);
   document.getElementById('btnCerrarModal').addEventListener('click', cerrarModalEstructura);
   
@@ -1892,52 +1683,42 @@ function editarNombreUnidad(unidad) {
 }
 
 function actualizarSelectorTemas() {
-  const dropdownTema = document.getElementById('dropdownTema');
-  const btnTemaDropdown = document.getElementById('btnTemaDropdown');
-  
-  dropdownTema.innerHTML = '';
+  const selTema = document.getElementById('selTema');
+  selTema.innerHTML = '';
   if (state.datos[state.unidadActual]) {
     const temasDisponibles = Object.keys(state.datos[state.unidadActual])
-      .filter(k => k !== '_nombre');
-    
+      .filter(k => k !== '_nombre');  // Filtrar _nombre
     temasDisponibles.forEach(t => {
-      const item = document.createElement('div');
-      item.classList.add('dropdown-item');
-      item.dataset.value = t;
+      const opt = document.createElement('option');
+      opt.value = t;
       const nombreGuardado = state.datos[state.unidadActual][t]?._nombre || ('Tema ' + t);
-      item.textContent = nombreGuardado;
-      if (String(state.temaActual) === String(t)) {
-        item.classList.add('active');
-        btnTemaDropdown.textContent = nombreGuardado;
-      }
-      dropdownTema.appendChild(item);
+      opt.textContent = nombreGuardado;
+      selTema.appendChild(opt);
     });
     
+    // Convertir temaActual a string para comparar correctamente
     state.temaActual = String(state.temaActual);
+    
+    // Si el tema actual no existe, usar el primero disponible
     if (!temasDisponibles.includes(state.temaActual)) {
       state.temaActual = temasDisponibles[0];
-      btnTemaDropdown.textContent = state.datos[state.unidadActual][state.temaActual]?._nombre || ('Tema ' + state.temaActual);
     }
+    
+    selTema.value = state.temaActual;
   }
 }
 
 function actualizarSelectorUnidades() {
-  const dropdownUnidad = document.getElementById('dropdownUnidad');
-  const btnUnidadDropdown = document.getElementById('btnUnidadDropdown');
-  
-  dropdownUnidad.innerHTML = '';
+  const selUnidad = document.getElementById('selUnidad');
+  selUnidad.innerHTML = '';
   Object.keys(state.datos).forEach(u => {
-    const item = document.createElement('div');
-    item.classList.add('dropdown-item');
-    item.dataset.value = u;
+    const opt = document.createElement('option');
+    opt.value = u;
     const nombreGuardado = state.datos[u]?._nombre || ('Unidad ' + u);
-    item.textContent = nombreGuardado;
-    if (state.unidadActual === u) {
-      item.classList.add('active');
-      btnUnidadDropdown.textContent = nombreGuardado;
-    }
-    dropdownUnidad.appendChild(item);
+    opt.textContent = nombreGuardado;
+    selUnidad.appendChild(opt);
   });
+  selUnidad.value = state.unidadActual;
   actualizarSelectorTemas();
 }
 
@@ -3266,15 +3047,6 @@ function toggleEditor() {
   state.editorActivo = !state.editorActivo;
   document.getElementById('panelEditor').classList.toggle('hidden', !state.editorActivo);
   document.getElementById('btnToggleEditor').classList.toggle('active', state.editorActivo);
-}
-
-function toggleToolsVisibility() {
-  const headerRight = document.querySelector('.header-right');
-  const btnToggle = document.getElementById('btnToggleTools');
-  
-  const isVisible = headerRight.style.display !== 'none';
-  headerRight.style.display = isVisible ? 'none' : 'flex';
-  btnToggle.classList.toggle('active', !isVisible);
 }
 
 // ===== UI UPDATES =====
