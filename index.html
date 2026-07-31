@@ -1410,7 +1410,8 @@ function initData() {
       _nombre: 'Unidad ' + u  // Agregar nombre default de unidad
     };
     for (let i = 1; i <= TEMAS_POR_UNIDAD; i++) {
-      state.datos[u][i] = {
+      // Usar string como clave para garantizar consistencia
+      state.datos[u][String(i)] = {
         _nombre: 'Tema ' + i,  // Agregar nombre default de tema
         tarjetas: []
       };
@@ -1768,9 +1769,11 @@ function renderEstructura() {
       item.className = 'estructura-item';
       item.dataset.tema = tema;
       
-      const nombreTema = state.datos[unidadSeleccionadaModal][tema]?._nombre || ('Tema ' + tema);
+      // Garantizar que tema sea string para acceso consistente
+      const temaStr = String(tema);
+      const nombreTema = state.datos[unidadSeleccionadaModal][temaStr]?._nombre || ('Tema ' + temaStr);
       item.innerHTML = `
-        <span class="estructura-nombre" contenteditable="false" data-unidad="${unidadSeleccionadaModal}" data-tema="${tema}" data-type="tema">${nombreTema}</span>
+        <span class="estructura-nombre" contenteditable="false" data-unidad="${unidadSeleccionadaModal}" data-tema="${temaStr}" data-type="tema">${nombreTema}</span>
         <div class="estructura-botones">
           <button class="btn-mini-modal agregar" title="Agregar tema" data-action="agregar" data-unidad="${unidadSeleccionadaModal}">+</button>
           <button class="btn-mini-modal borrar" title="Borrar tema" data-action="borrar" data-unidad="${unidadSeleccionadaModal}" data-tema="${tema}">−</button>
@@ -1904,9 +1907,11 @@ function actualizarSelectorTemas() {
       const item = document.createElement('div');
       item.classList.add('dropdown-item');
       item.dataset.value = t;
-      const nombreGuardado = state.datos[state.unidadActual][t]?._nombre || ('Tema ' + t);
+      // Garantizar que t sea string para acceso consistente
+      const tStr = String(t);
+      const nombreGuardado = state.datos[state.unidadActual][tStr]?._nombre || ('Tema ' + tStr);
       item.textContent = nombreGuardado;
-      if (String(state.temaActual) === String(t)) {
+      if (String(state.temaActual) === tStr) {
         item.classList.add('active');
         btnTemaDropdown.textContent = nombreGuardado;
       }
@@ -1953,7 +1958,8 @@ function agregarUnidad() {
   state.datos[letraNueva] = {
     _nombre: 'Unidad ' + letraNueva
   };
-  state.datos[letraNueva][1] = {
+  // Usar string como clave para garantizar consistencia
+  state.datos[letraNueva]['1'] = {
     _nombre: 'Tema 1',
     tarjetas: []
   };
@@ -1985,7 +1991,9 @@ function agregarTemaEnUnidad(unidad) {
     .map(Number);
   const nuevoTemaNum = Math.max(...temasExistentes, 0) + 1;
   
-  state.datos[unidad][nuevoTemaNum] = {
+  // Usar string como clave para garantizar consistencia
+  const nuevoTemaStr = String(nuevoTemaNum);
+  state.datos[unidad][nuevoTemaStr] = {
     _nombre: 'Tema ' + nuevoTemaNum,
     tarjetas: []
   };
