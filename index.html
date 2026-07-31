@@ -59,6 +59,8 @@ header {
   padding: 0 20px;
   gap: 20px;
   z-index: 100;
+  pointer-events: auto;
+  touch-action: auto;
 }
 
 .header-left {
@@ -120,6 +122,8 @@ header {
   align-items: center;
   justify-content: center;
   transition: all 0.15s;
+  pointer-events: auto;
+  z-index: 101;
 }
 
 .btn:hover {
@@ -175,8 +179,9 @@ header {
   height: calc(100dvh - var(--header-h));
   background: transparent;
   overflow: hidden;
-  touch-action: none;
+  touch-action: manipulation;
   perspective: 1000px;
+  z-index: 5;
 }
 
 /* ===== TARJETAS ===== */
@@ -1237,25 +1242,53 @@ function init() {
 }
 
 function initData() {
+  // Primero: crear la estructura base para todas las unidades
   UNIDADES.forEach(u => {
-    state.datos[u] = {
-      _nombre: 'Unidad ' + u  // Agregar nombre default de unidad
-    };
+    state.datos[u] = state.datos[u] || {};
+    state.datos[u]._nombre = state.datos[u]._nombre || ('Unidad ' + u);
+    
+    // Asegurar que existen todos los temas (de 1 a TEMAS_POR_UNIDAD)
     for (let i = 1; i <= TEMAS_POR_UNIDAD; i++) {
-      state.datos[u][i] = {
-        _nombre: 'Tema ' + i,  // Agregar nombre default de tema
-        tarjetas: []
-      };
+      if (!state.datos[u][i]) {
+        state.datos[u][i] = {
+          _nombre: 'Tema ' + i,
+          tarjetas: []
+        };
+      }
     }
   });
-  loadFromStorage();
+  
+  // Luego: cargar datos guardados (que merge con la estructura base)
+  const saved = localStorage.getItem('cuaderno-state');
+  if (saved) {
+    try {
+      const savedData = JSON.parse(saved);
+      // Merge: copiar tarjetas guardadas pero mantener la estructura
+      UNIDADES.forEach(u => {
+        if (savedData[u]) {
+          for (let i = 1; i <= TEMAS_POR_UNIDAD; i++) {
+            if (savedData[u][i] && savedData[u][i].tarjetas) {
+              state.datos[u][i].tarjetas = savedData[u][i].tarjetas;
+            }
+          }
+        }
+      });
+    } catch (e) {
+      console.warn('Error loading saved data:', e);
+    }
+  }
+  
+  // Inicializar historial
+  state.historial = [JSON.parse(JSON.stringify(state.datos))];
+  state.indexHistorial = 0;
 }
 
 function setupEventListeners() {
   // Selectores
   document.getElementById('selUnidad').addEventListener('change', (e) => {
     state.unidadActual = e.target.value;
-    state.temaActual = Object.keys(state.datos[state.unidadActual])[0]; // Ir al primer tema de la nueva unidad
+    const temasDisponibles = Object.keys(state.datos[state.unidadActual]).filter(k => k !== '_nombre');
+    state.temaActual = temasDisponibles.length > 0 ? temasDisponibles[0] : '1';
     state.tarjetaSeleccionada = null;
     actualizarSelectorTemas();
     renderCards();
@@ -1294,7 +1327,7 @@ function setupEventListeners() {
   // Panel editor - filas y columnas
   document.getElementById('btnAddRow').addEventListener('click', () => {
     if (!state.tarjetaSeleccionada) return;
-    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const tarjetas = state.datos[state.unidadActual][state.temaActual].tarjetas || [];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card) {
       // Insertar DESPUÉS de la fila seleccionada
@@ -1318,7 +1351,7 @@ function setupEventListeners() {
   
   document.getElementById('btnDelRow').addEventListener('click', () => {
     if (!state.tarjetaSeleccionada) return;
-    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const tarjetas = state.datos[state.unidadActual][state.temaActual].tarjetas || [];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card && card.contenido.length > 1) {
       // Borrar la fila seleccionada
@@ -1335,7 +1368,7 @@ function setupEventListeners() {
   
   document.getElementById('btnAddCol').addEventListener('click', () => {
     if (!state.tarjetaSeleccionada) return;
-    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const tarjetas = state.datos[state.unidadActual][state.temaActual].tarjetas || [];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card) {
       // Insertar DESPUÉS de la columna seleccionada
@@ -1361,7 +1394,7 @@ function setupEventListeners() {
   
   document.getElementById('btnDelCol').addEventListener('click', () => {
     if (!state.tarjetaSeleccionada) return;
-    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const tarjetas = state.datos[state.unidadActual][state.temaActual].tarjetas || [];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card && card.cols > 1) {
       // Borrar la columna seleccionada
@@ -1385,7 +1418,7 @@ function setupEventListeners() {
   document.getElementById('btnDuplicarTarjeta').addEventListener('click', () => {
     if (!state.tarjetaSeleccionada) return;
     
-    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const tarjetas = state.datos[state.unidadActual][state.temaActual].tarjetas || [];
     const idx = tarjetas.findIndex(c => c.id === state.tarjetaSeleccionada);
     
     if (idx !== -1) {
@@ -1406,7 +1439,7 @@ function setupEventListeners() {
   document.getElementById('btnVaciarTarjeta').addEventListener('click', () => {
     if (!state.tarjetaSeleccionada) return;
     
-    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const tarjetas = state.datos[state.unidadActual][state.temaActual].tarjetas || [];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     
     if (card) {
@@ -1426,7 +1459,7 @@ function setupEventListeners() {
   
   document.getElementById('btnConfirmarBorrar').addEventListener('click', () => {
     if (!state.tarjetaSeleccionada) return;
-    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const tarjetas = state.datos[state.unidadActual][state.temaActual].tarjetas || [];
     const idx = tarjetas.findIndex(c => c.id === state.tarjetaSeleccionada);
     if (idx !== -1) {
       tarjetas.splice(idx, 1);
@@ -1454,7 +1487,7 @@ function setupEventListeners() {
     const porcentaje = Math.round(escala * 100);
     document.getElementById('escalaLabel').textContent = porcentaje + '%';
     
-    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const tarjetas = state.datos[state.unidadActual][state.temaActual].tarjetas || [];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card) {
       card.scale = escala;
@@ -1688,6 +1721,17 @@ function actualizarSelectorTemas() {
   if (state.datos[state.unidadActual]) {
     const temasDisponibles = Object.keys(state.datos[state.unidadActual])
       .filter(k => k !== '_nombre');  // Filtrar _nombre
+    
+    // Si no hay temas, crear uno automáticamente
+    if (temasDisponibles.length === 0) {
+      state.datos[state.unidadActual][1] = {
+        _nombre: 'Tema 1',
+        tarjetas: []
+      };
+      temasDisponibles.push('1');
+      saveToStorage();
+    }
+    
     temasDisponibles.forEach(t => {
       const opt = document.createElement('option');
       opt.value = t;
@@ -1857,7 +1901,10 @@ function agregarTema(unidad) {
 function borrarTema(unidad, tema) {
   if (!state.datos[unidad]) return;
   
-  if (Object.keys(state.datos[unidad]).length <= 1) {
+  // Contar solo los temas (no contar _nombre)
+  const temasExistentes = Object.keys(state.datos[unidad]).filter(k => k !== '_nombre');
+  
+  if (temasExistentes.length <= 1) {
     alert('No puedes borrar el último tema');
     return;
   }
@@ -1866,7 +1913,7 @@ function borrarTema(unidad, tema) {
   
   // Si era el tema actual, cambiar al primero disponible
   if (state.unidadActual === unidad && state.temaActual === tema) {
-    const temasRestantes = Object.keys(state.datos[unidad]);
+    const temasRestantes = Object.keys(state.datos[unidad]).filter(k => k !== '_nombre');
     state.temaActual = temasRestantes[0];
   }
   
@@ -1944,7 +1991,7 @@ function renderSelectorEstilos() {
   if (!state.celdaSeleccionada) return;
   
   const { tarjetaId, fila, col, esTitle } = state.celdaSeleccionada;
-  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].tarjetas.find(c => c.id === tarjetaId);
   
   if (!tarjeta) return;
   
@@ -2008,7 +2055,7 @@ function renderSelectorEstilos() {
       
       if (celdaActiva) {
         const { tarjetaId, fila, col: colCell, esTitle } = celdaActiva;
-        const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
+        const tarjeta = state.datos[state.unidadActual][state.temaActual].tarjetas.find(c => c.id === tarjetaId);
         
         if (tarjeta) {
           if (esTitle) {
@@ -2056,7 +2103,7 @@ function renderSelectorEstilos() {
       
       if (celdaActiva) {
         const { tarjetaId, fila, col: colCell, esTitle } = celdaActiva;
-        const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
+        const tarjeta = state.datos[state.unidadActual][state.temaActual].tarjetas.find(c => c.id === tarjetaId);
         
         if (tarjeta) {
           if (esTitle) {
@@ -2088,7 +2135,7 @@ function aplicarBold(bold) {
   if (!state.celdaSeleccionada) return;
   
   const { tarjetaId, fila, col, esTitle } = state.celdaSeleccionada;
-  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].tarjetas.find(c => c.id === tarjetaId);
   
   if (!tarjeta) return;
   
@@ -2146,7 +2193,7 @@ function actualizarPreview() {
   if (!state.celdaSeleccionada) return;
   
   const { tarjetaId, fila, col, esTitle } = state.celdaSeleccionada;
-  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].tarjetas.find(c => c.id === tarjetaId);
   
   if (!tarjeta) return;
   
@@ -2190,7 +2237,7 @@ function aplicarAlineacion(alineacion) {
   if (!state.celdaSeleccionada) return;
   
   const { tarjetaId, fila, col, esTitle } = state.celdaSeleccionada;
-  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].tarjetas.find(c => c.id === tarjetaId);
   
   if (!tarjeta) return;
   
@@ -2250,7 +2297,7 @@ function aplicarEstiloACelda(estilos) {
   if (!state.celdaSeleccionada) return;
   
   const { tarjetaId, fila, col, esTitle } = state.celdaSeleccionada;
-  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].tarjetas.find(c => c.id === tarjetaId);
   
   if (!tarjeta) return;
   
@@ -2412,7 +2459,11 @@ function renderParticulas() {
 
 // ===== AGREGAR TARJETA =====
 function addCard() {
-  const tarjetas = state.datos[state.unidadActual][state.temaActual];
+  const tema = state.datos[state.unidadActual][state.temaActual];
+  if (!tema.tarjetas) {
+    tema.tarjetas = [];
+  }
+  const tarjetas = tema.tarjetas;
   const id = Date.now();
   const newCard = {
     id,
@@ -2544,7 +2595,7 @@ function renderCards() {
     }
   }
   
-  const tarjetas = tema || [];
+  const tarjetas = (tema && tema.tarjetas) ? tema.tarjetas : [];
   
   // Ocultar sección si no hay tarjeta seleccionada
   if (!state.tarjetaSeleccionada) {
@@ -2857,7 +2908,7 @@ function renderCards() {
 // ===== SELECCIONAR TARJETA =====
 function selectCard(id) {
   state.tarjetaSeleccionada = id;
-  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === id);
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].tarjetas.find(c => c.id === id);
   if (tarjeta) {
     state.bordeSeleccionado = tarjeta.borde;
     state.colsSeleccionadas = tarjeta.cols;
@@ -2879,7 +2930,7 @@ function selectCard(id) {
 function aplicarBorde() {
   if (!state.tarjetaSeleccionada || !state.bordeSeleccionado) return;
   
-  const tarjetas = state.datos[state.unidadActual][state.temaActual];
+  const tarjetas = state.datos[state.unidadActual][state.temaActual].tarjetas || [];
   
   if (state.aplicarA === 'una') {
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
@@ -2895,7 +2946,7 @@ function aplicarBorde() {
 function aplicarCols() {
   if (!state.tarjetaSeleccionada) return;
   
-  const tarjetas = state.datos[state.unidadActual][state.temaActual];
+  const tarjetas = state.datos[state.unidadActual][state.temaActual].tarjetas || [];
   const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
   
   if (card) {
@@ -3005,7 +3056,7 @@ function onPointerMove(ev) {
     newX = Math.max(0, Math.min(newX, dragInfo.maxX));
     newY = Math.max(0, Math.min(newY, dragInfo.maxY));
     
-    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const tarjetas = state.datos[state.unidadActual][state.temaActual].tarjetas || [];
     const card = tarjetas.find(c => c.id === dragInfo.cardId);
     if (card) {
       card.x = newX;
@@ -3017,7 +3068,7 @@ function onPointerMove(ev) {
     const factor = distanciaEntre(pts[0], pts[1]) / pinchInicial.distancia;
     const nueva = Math.min(2.5, Math.max(0.5, pinchInicial.escala * factor));
     
-    const tarjetas = state.datos[state.unidadActual][state.temaActual];
+    const tarjetas = state.datos[state.unidadActual][state.temaActual].tarjetas || [];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card) {
       card.scale = nueva;
@@ -3076,13 +3127,8 @@ function saveToStorage() {
 }
 
 function loadFromStorage() {
-  const saved = localStorage.getItem('cuaderno-state');
-  if (saved) {
-    state.datos = JSON.parse(saved);
-  }
-  // Inicializar historial con el estado actual
-  state.historial = [JSON.parse(JSON.stringify(state.datos))];
-  state.indexHistorial = 0;
+  // Ahora la lógica está en initData()
+  // Esta función se mantiene por si se llama desde otro lado
 }
 
 // ===== PARTICLE SYSTEM =====
