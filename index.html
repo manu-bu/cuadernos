@@ -1410,8 +1410,7 @@ function initData() {
       _nombre: 'Unidad ' + u  // Agregar nombre default de unidad
     };
     for (let i = 1; i <= TEMAS_POR_UNIDAD; i++) {
-      // Usar string como clave para garantizar consistencia
-      state.datos[u][String(i)] = {
+      state.datos[u][i] = {
         _nombre: 'Tema ' + i,  // Agregar nombre default de tema
         tarjetas: []
       };
@@ -1504,7 +1503,7 @@ function setupEventListeners() {
   // Panel editor - filas y columnas
   document.getElementById('btnAddRow').addEventListener('click', () => {
     if (!state.tarjetaSeleccionada) return;
-    const tarjetas = obtenerTarjetasTema(state.unidadActual, state.temaActual);
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card) {
       // Insertar DESPUÉS de la fila seleccionada
@@ -1528,7 +1527,7 @@ function setupEventListeners() {
   
   document.getElementById('btnDelRow').addEventListener('click', () => {
     if (!state.tarjetaSeleccionada) return;
-    const tarjetas = obtenerTarjetasTema(state.unidadActual, state.temaActual);
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card && card.contenido.length > 1) {
       // Borrar la fila seleccionada
@@ -1545,7 +1544,7 @@ function setupEventListeners() {
   
   document.getElementById('btnAddCol').addEventListener('click', () => {
     if (!state.tarjetaSeleccionada) return;
-    const tarjetas = obtenerTarjetasTema(state.unidadActual, state.temaActual);
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card) {
       // Insertar DESPUÉS de la columna seleccionada
@@ -1571,7 +1570,7 @@ function setupEventListeners() {
   
   document.getElementById('btnDelCol').addEventListener('click', () => {
     if (!state.tarjetaSeleccionada) return;
-    const tarjetas = obtenerTarjetasTema(state.unidadActual, state.temaActual);
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card && card.cols > 1) {
       // Borrar la columna seleccionada
@@ -1595,7 +1594,7 @@ function setupEventListeners() {
   document.getElementById('btnDuplicarTarjeta').addEventListener('click', () => {
     if (!state.tarjetaSeleccionada) return;
     
-    const tarjetas = obtenerTarjetasTema(state.unidadActual, state.temaActual);
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const idx = tarjetas.findIndex(c => c.id === state.tarjetaSeleccionada);
     
     if (idx !== -1) {
@@ -1616,7 +1615,7 @@ function setupEventListeners() {
   document.getElementById('btnVaciarTarjeta').addEventListener('click', () => {
     if (!state.tarjetaSeleccionada) return;
     
-    const tarjetas = obtenerTarjetasTema(state.unidadActual, state.temaActual);
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     
     if (card) {
@@ -1636,7 +1635,7 @@ function setupEventListeners() {
   
   document.getElementById('btnConfirmarBorrar').addEventListener('click', () => {
     if (!state.tarjetaSeleccionada) return;
-    const tarjetas = obtenerTarjetasTema(state.unidadActual, state.temaActual);
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const idx = tarjetas.findIndex(c => c.id === state.tarjetaSeleccionada);
     if (idx !== -1) {
       tarjetas.splice(idx, 1);
@@ -1664,7 +1663,7 @@ function setupEventListeners() {
     const porcentaje = Math.round(escala * 100);
     document.getElementById('escalaLabel').textContent = porcentaje + '%';
     
-    const tarjetas = obtenerTarjetasTema(state.unidadActual, state.temaActual);
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card) {
       card.scale = escala;
@@ -1769,11 +1768,9 @@ function renderEstructura() {
       item.className = 'estructura-item';
       item.dataset.tema = tema;
       
-      // Garantizar que tema sea string para acceso consistente
-      const temaStr = String(tema);
-      const nombreTema = state.datos[unidadSeleccionadaModal][temaStr]?._nombre || ('Tema ' + temaStr);
+      const nombreTema = state.datos[unidadSeleccionadaModal][tema]?._nombre || ('Tema ' + tema);
       item.innerHTML = `
-        <span class="estructura-nombre" contenteditable="false" data-unidad="${unidadSeleccionadaModal}" data-tema="${temaStr}" data-type="tema">${nombreTema}</span>
+        <span class="estructura-nombre" contenteditable="false" data-unidad="${unidadSeleccionadaModal}" data-tema="${tema}" data-type="tema">${nombreTema}</span>
         <div class="estructura-botones">
           <button class="btn-mini-modal agregar" title="Agregar tema" data-action="agregar" data-unidad="${unidadSeleccionadaModal}">+</button>
           <button class="btn-mini-modal borrar" title="Borrar tema" data-action="borrar" data-unidad="${unidadSeleccionadaModal}" data-tema="${tema}">−</button>
@@ -1907,11 +1904,9 @@ function actualizarSelectorTemas() {
       const item = document.createElement('div');
       item.classList.add('dropdown-item');
       item.dataset.value = t;
-      // Garantizar que t sea string para acceso consistente
-      const tStr = String(t);
-      const nombreGuardado = state.datos[state.unidadActual][tStr]?._nombre || ('Tema ' + tStr);
+      const nombreGuardado = state.datos[state.unidadActual][t]?._nombre || ('Tema ' + t);
       item.textContent = nombreGuardado;
-      if (String(state.temaActual) === tStr) {
+      if (String(state.temaActual) === String(t)) {
         item.classList.add('active');
         btnTemaDropdown.textContent = nombreGuardado;
       }
@@ -1958,8 +1953,7 @@ function agregarUnidad() {
   state.datos[letraNueva] = {
     _nombre: 'Unidad ' + letraNueva
   };
-  // Usar string como clave para garantizar consistencia
-  state.datos[letraNueva]['1'] = {
+  state.datos[letraNueva][1] = {
     _nombre: 'Tema 1',
     tarjetas: []
   };
@@ -1991,9 +1985,7 @@ function agregarTemaEnUnidad(unidad) {
     .map(Number);
   const nuevoTemaNum = Math.max(...temasExistentes, 0) + 1;
   
-  // Usar string como clave para garantizar consistencia
-  const nuevoTemaStr = String(nuevoTemaNum);
-  state.datos[unidad][nuevoTemaStr] = {
+  state.datos[unidad][nuevoTemaNum] = {
     _nombre: 'Tema ' + nuevoTemaNum,
     tarjetas: []
   };
@@ -2171,7 +2163,7 @@ function renderSelectorEstilos() {
   if (!state.celdaSeleccionada) return;
   
   const { tarjetaId, fila, col, esTitle } = state.celdaSeleccionada;
-  const tarjeta = obtenerTarjetasTema(state.unidadActual, state.temaActual).find(c => c.id === tarjetaId);
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
   
   if (!tarjeta) return;
   
@@ -2235,7 +2227,7 @@ function renderSelectorEstilos() {
       
       if (celdaActiva) {
         const { tarjetaId, fila, col: colCell, esTitle } = celdaActiva;
-        const tarjeta = obtenerTarjetasTema(state.unidadActual, state.temaActual).find(c => c.id === tarjetaId);
+        const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
         
         if (tarjeta) {
           if (esTitle) {
@@ -2283,7 +2275,7 @@ function renderSelectorEstilos() {
       
       if (celdaActiva) {
         const { tarjetaId, fila, col: colCell, esTitle } = celdaActiva;
-        const tarjeta = obtenerTarjetasTema(state.unidadActual, state.temaActual).find(c => c.id === tarjetaId);
+        const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
         
         if (tarjeta) {
           if (esTitle) {
@@ -2315,7 +2307,7 @@ function aplicarBold(bold) {
   if (!state.celdaSeleccionada) return;
   
   const { tarjetaId, fila, col, esTitle } = state.celdaSeleccionada;
-  const tarjeta = obtenerTarjetasTema(state.unidadActual, state.temaActual).find(c => c.id === tarjetaId);
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
   
   if (!tarjeta) return;
   
@@ -2373,7 +2365,7 @@ function actualizarPreview() {
   if (!state.celdaSeleccionada) return;
   
   const { tarjetaId, fila, col, esTitle } = state.celdaSeleccionada;
-  const tarjeta = obtenerTarjetasTema(state.unidadActual, state.temaActual).find(c => c.id === tarjetaId);
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
   
   if (!tarjeta) return;
   
@@ -2417,7 +2409,7 @@ function aplicarAlineacion(alineacion) {
   if (!state.celdaSeleccionada) return;
   
   const { tarjetaId, fila, col, esTitle } = state.celdaSeleccionada;
-  const tarjeta = obtenerTarjetasTema(state.unidadActual, state.temaActual).find(c => c.id === tarjetaId);
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
   
   if (!tarjeta) return;
   
@@ -2477,7 +2469,7 @@ function aplicarEstiloACelda(estilos) {
   if (!state.celdaSeleccionada) return;
   
   const { tarjetaId, fila, col, esTitle } = state.celdaSeleccionada;
-  const tarjeta = obtenerTarjetasTema(state.unidadActual, state.temaActual).find(c => c.id === tarjetaId);
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === tarjetaId);
   
   if (!tarjeta) return;
   
@@ -2554,7 +2546,7 @@ function renderFondo() {
   // Input de color
   const colorInput = document.createElement('input');
   colorInput.type = 'color';
-  colorInput.value = obtenerObjTema(state.unidadActual, state.temaActual)?.fondo || '#f0ebe5';
+  colorInput.value = state.datos[state.unidadActual][state.temaActual]?.fondo || '#f0ebe5';
   colorInput.style.width = '60px';
   colorInput.style.height = '40px';
   colorInput.style.border = '2px solid #c4956b';
@@ -2565,7 +2557,7 @@ function renderFondo() {
   colorInput.addEventListener('change', (e) => {
     const color = e.target.value;
     document.documentElement.style.setProperty('--bg-app', color);
-    guardarPropTema(state.unidadActual, state.temaActual, 'fondo', color);
+    state.datos[state.unidadActual][state.temaActual].fondo = color;
     saveToStorage();
     renderCards();
     cerrarModalFondo();
@@ -2612,20 +2604,15 @@ function renderParticulas() {
     label.style.cssText = 'cursor: pointer; flex: 1; margin: 0;';
     
     // Inicializar estado del checkbox
-    const temaObj = obtenerObjTema(state.unidadActual, state.temaActual);
-    if (temaObj && !temaObj.particulasActivas) {
-      temaObj.particulasActivas = {};
+    if (!state.datos[state.unidadActual][state.temaActual].particulasActivas) {
+      state.datos[state.unidadActual][state.temaActual].particulasActivas = {};
     }
-    checkbox.checked = !!temaObj?.particulasActivas?.[part.value];
+    checkbox.checked = !!state.datos[state.unidadActual][state.temaActual].particulasActivas[part.value];
     
     checkbox.addEventListener('change', () => {
-      const temaObj2 = obtenerObjTema(state.unidadActual, state.temaActual);
-      if (temaObj2) {
-        if (!temaObj2.particulasActivas) temaObj2.particulasActivas = {};
-        temaObj2.particulasActivas[part.value] = checkbox.checked;
-        saveToStorage();
-        actualizarParticulas();
-      }
+      state.datos[state.unidadActual][state.temaActual].particulasActivas[part.value] = checkbox.checked;
+      saveToStorage();
+      actualizarParticulas();
     });
     
     container.addEventListener('mouseenter', () => {
@@ -2644,7 +2631,7 @@ function renderParticulas() {
 
 // ===== AGREGAR TARJETA =====
 function addCard() {
-  const tarjetas = obtenerTarjetasTema(state.unidadActual, state.temaActual);
+  const tarjetas = state.datos[state.unidadActual][state.temaActual];
   const id = Date.now();
   const newCard = {
     id,
@@ -2679,7 +2666,7 @@ function addCard() {
 // ===== RENDERIZAR =====
 // ===== ACTUALIZAR PARTÍCULAS ACTIVAS =====
 function actualizarParticulas() {
-  const particulasActivas = obtenerObjTema(state.unidadActual, state.temaActual)?.particulasActivas || {};
+  const particulasActivas = state.datos[state.unidadActual][state.temaActual].particulasActivas || {};
   
   // Detener todas las partículas
   if (particleSystemFlores) { particleSystemFlores.stop(); particleSystemFlores = null; }
@@ -2726,7 +2713,7 @@ function renderCards() {
   mesa.innerHTML = '';
   
   // Aplicar fondo del tema
-  const tema = obtenerObjTema(state.unidadActual, state.temaActual);
+  const tema = state.datos[state.unidadActual][state.temaActual];
   if (tema?.fondo) {
     document.documentElement.style.setProperty('--bg-app', tema.fondo);
   }
@@ -2776,7 +2763,7 @@ function renderCards() {
     }
   }
   
-  const tarjetas = obtenerTarjetasTema(state.unidadActual, state.temaActual);
+  const tarjetas = tema || [];
   
   // Ocultar sección si no hay tarjeta seleccionada
   if (!state.tarjetaSeleccionada) {
@@ -3089,7 +3076,7 @@ function renderCards() {
 // ===== SELECCIONAR TARJETA =====
 function selectCard(id) {
   state.tarjetaSeleccionada = id;
-  const tarjeta = obtenerTarjetasTema(state.unidadActual, state.temaActual).find(c => c.id === id);
+  const tarjeta = state.datos[state.unidadActual][state.temaActual].find(c => c.id === id);
   if (tarjeta) {
     state.bordeSeleccionado = tarjeta.borde;
     state.colsSeleccionadas = tarjeta.cols;
@@ -3111,7 +3098,7 @@ function selectCard(id) {
 function aplicarBorde() {
   if (!state.tarjetaSeleccionada || !state.bordeSeleccionado) return;
   
-  const tarjetas = obtenerTarjetasTema(state.unidadActual, state.temaActual);
+  const tarjetas = state.datos[state.unidadActual][state.temaActual];
   
   if (state.aplicarA === 'una') {
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
@@ -3127,7 +3114,7 @@ function aplicarBorde() {
 function aplicarCols() {
   if (!state.tarjetaSeleccionada) return;
   
-  const tarjetas = obtenerTarjetasTema(state.unidadActual, state.temaActual);
+  const tarjetas = state.datos[state.unidadActual][state.temaActual];
   const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
   
   if (card) {
@@ -3237,7 +3224,7 @@ function onPointerMove(ev) {
     newX = Math.max(0, Math.min(newX, dragInfo.maxX));
     newY = Math.max(0, Math.min(newY, dragInfo.maxY));
     
-    const tarjetas = obtenerTarjetasTema(state.unidadActual, state.temaActual);
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const card = tarjetas.find(c => c.id === dragInfo.cardId);
     if (card) {
       card.x = newX;
@@ -3249,7 +3236,7 @@ function onPointerMove(ev) {
     const factor = distanciaEntre(pts[0], pts[1]) / pinchInicial.distancia;
     const nueva = Math.min(2.5, Math.max(0.5, pinchInicial.escala * factor));
     
-    const tarjetas = obtenerTarjetasTema(state.unidadActual, state.temaActual);
+    const tarjetas = state.datos[state.unidadActual][state.temaActual];
     const card = tarjetas.find(c => c.id === state.tarjetaSeleccionada);
     if (card) {
       card.scale = nueva;
@@ -3313,7 +3300,6 @@ function saveToStorage() {
   // Guardar en historial ANTES de persistir
   guardarEnHistorial();
   // Guardar en localStorage
-  console.log('Guardando state.datos:', JSON.stringify(state.datos, null, 2));
   localStorage.setItem('cuaderno-state', JSON.stringify(state.datos));
 }
 
@@ -3321,32 +3307,6 @@ function loadFromStorage() {
   const saved = localStorage.getItem('cuaderno-state');
   if (saved) {
     state.datos = JSON.parse(saved);
-    
-    // MIGRACIÓN: Convertir estructura antigua a nueva
-    // Antes: tema = array directo de tarjetas
-    // Ahora: tema = { _nombre, tarjetas: [...] }
-    Object.keys(state.datos).forEach(unidad => {
-      if (state.datos[unidad] && typeof state.datos[unidad] === 'object') {
-        Object.keys(state.datos[unidad]).forEach(tema => {
-          if (tema !== '_nombre') {
-            const temaData = state.datos[unidad][tema];
-            
-            // Si es un array (estructura antigua), migrar a nueva
-            if (Array.isArray(temaData)) {
-              state.datos[unidad][tema] = {
-                _nombre: state.datos[unidad][tema + '_nombre'] || ('Tema ' + tema),
-                tarjetas: temaData
-              };
-              delete state.datos[unidad][tema + '_nombre'];
-            }
-            // Si es objeto pero no tiene _nombre, agregarlo
-            else if (typeof temaData === 'object' && !temaData._nombre) {
-              temaData._nombre = 'Tema ' + tema;
-            }
-          }
-        });
-      }
-    });
   }
   // Inicializar historial con el estado actual
   state.historial = [JSON.parse(JSON.stringify(state.datos))];
@@ -4281,53 +4241,6 @@ class FourPointStarParticleSystem {
         p.element.parentElement.removeChild(p.element);
       }
     });
-  }
-}
-
-// ===== HELPERS =====
-function obtenerTarjetasTema(unidad, tema) {
-  const temaData = state.datos[unidad]?.[tema];
-  if (!temaData) return [];
-  // Manejar ambas estructuras: array antiguo o objeto nuevo
-  return Array.isArray(temaData) ? temaData : (temaData.tarjetas || []);
-}
-
-function guardarTarjetasTema(unidad, tema, tarjetas) {
-  const temaData = state.datos[unidad]?.[tema];
-  if (!temaData) return;
-  if (Array.isArray(temaData)) {
-    // Estructura antigua - reemplazar directamente
-    state.datos[unidad][tema] = tarjetas;
-  } else {
-    // Estructura nueva - actualizar .tarjetas
-    temaData.tarjetas = tarjetas;
-  }
-}
-
-function obtenerObjTema(unidad, tema) {
-  const temaData = state.datos[unidad]?.[tema];
-  if (!temaData) return null;
-  // Si es array (estructura antigua), convertir a objeto
-  if (Array.isArray(temaData)) {
-    return { tarjetas: temaData };
-  }
-  return temaData;
-}
-
-function guardarPropTema(unidad, tema, prop, valor) {
-  const temaData = state.datos[unidad]?.[tema];
-  if (!temaData) return;
-  if (Array.isArray(temaData)) {
-    // Estructura antigua - necesitamos convertir
-    const tarjetas = temaData;
-    state.datos[unidad][tema] = {
-      _nombre: `Tema ${tema}`,
-      tarjetas: tarjetas,
-      [prop]: valor
-    };
-  } else {
-    // Estructura nueva
-    temaData[prop] = valor;
   }
 }
 
