@@ -3308,21 +3308,6 @@ function loadFromStorage() {
   const saved = localStorage.getItem('cuaderno-state');
   if (saved) {
     state.datos = JSON.parse(saved);
-    
-    // Asegurar que cada tema tiene _nombre
-    Object.keys(state.datos).forEach(unidad => {
-      if (state.datos[unidad] && typeof state.datos[unidad] === 'object') {
-        Object.keys(state.datos[unidad]).forEach(tema => {
-          if (tema !== '_nombre') {
-            const temaData = state.datos[unidad][tema];
-            // Si el tema NO tiene _nombre, agregarle uno
-            if (temaData && typeof temaData === 'object' && !temaData._nombre) {
-              temaData._nombre = 'Tema ' + tema;
-            }
-          }
-        });
-      }
-    });
   }
   // Inicializar historial con el estado actual
   state.historial = [JSON.parse(JSON.stringify(state.datos))];
