@@ -3300,6 +3300,7 @@ function saveToStorage() {
   // Guardar en historial ANTES de persistir
   guardarEnHistorial();
   // Guardar en localStorage
+  console.log('Guardando state.datos:', JSON.stringify(state.datos, null, 2));
   localStorage.setItem('cuaderno-state', JSON.stringify(state.datos));
 }
 
