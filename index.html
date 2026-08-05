@@ -51,8 +51,6 @@ header {
   top: 0; left: 0;
   width: 100%;
   height: var(--header-h);
-  background: var(--header-bg);
-  border-bottom: 1px solid var(--border-header);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -882,6 +880,7 @@ header {
   </div>
   
   <div class="header-right">
+    <button class="btn" id="btnToggleRightButtons" title="Mostrar/Esconder" style="font-size: 14px; font-weight: bold; width: 38px; height: 38px; border-radius: 50%; padding: 0;">H</button>
     <button class="btn" id="btnDeshacer" title="Deshacer (Ctrl+Z)" style="opacity: 0.5; font-size: 9px;" disabled>&lt;</button>
     <button class="btn" id="btnEditarEstructura" title="Editar estructura" style="font-size: 9px;">ARBOL</button>
     <button class="btn" id="btnModoVoz" title="Modo Voz" style="font-size: 9px;">SONID</button>
@@ -1304,6 +1303,7 @@ function setupEventListeners() {
   document.getElementById('btnAddCard').addEventListener('click', addCard);
   document.getElementById('btnToggleEditor').addEventListener('click', toggleEditor);
   document.getElementById('btnDeshacer').addEventListener('click', deshacer);
+  document.getElementById('btnToggleRightButtons').addEventListener('click', toggleRightButtons);
   document.getElementById('btnEditarEstructura').addEventListener('click', abrirModalEstructura);
   document.getElementById('btnEditarFondo').addEventListener('click', abrirModalFondo);
   document.getElementById('btnDescargar').addEventListener('click', descargarBackup);
@@ -2727,6 +2727,7 @@ function renderCards() {
         cell.addEventListener('click', (e) => {
           e.stopPropagation();
           state.celdaSeleccionada = { tarjetaId: card.id, fila, col };
+          state.tarjetaSeleccionada = card.id;
           cell.contentEditable = 'true';
           cell.focus();
           // Mostrar sección de estilos
@@ -3091,6 +3092,24 @@ function onPointerUp(ev) {
     dragInfo = null;
     pinchInicial = null;
   }
+}
+
+// ===== TOGGLE BOTONES DERECHOS =====
+function toggleRightButtons() {
+  const btnDeshacer = document.getElementById('btnDeshacer');
+  const btnEditarEstructura = document.getElementById('btnEditarEstructura');
+  const btnModoVoz = document.getElementById('btnModoVoz');
+  const btnEditarFondo = document.getElementById('btnEditarFondo');
+  const btnDescargar = document.getElementById('btnDescargar');
+  const btnCargar = document.getElementById('btnCargar');
+  const btnAddCard = document.getElementById('btnAddCard');
+  const btnToggleEditor = document.getElementById('btnToggleEditor');
+  
+  const botones = [btnDeshacer, btnEditarEstructura, btnModoVoz, btnEditarFondo, btnDescargar, btnCargar, btnAddCard, btnToggleEditor];
+  
+  botones.forEach(btn => {
+    btn.style.display = btn.style.display === 'none' ? 'block' : 'none';
+  });
 }
 
 // ===== EDITOR TOGGLE =====
