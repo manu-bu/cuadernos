@@ -1935,19 +1935,12 @@ function agregarUnidad() {
     tarjetas: []
   };
   
-  // Actualizar selector de unidades
-  const selUnidad = document.getElementById('selUnidad');
-  const option = document.createElement('option');
-  option.value = letraNueva;
-  option.textContent = 'Unidad ' + letraNueva;
-  selUnidad.appendChild(option);
-  
   // Cambiar a la nueva unidad
   state.unidadActual = letraNueva;
   state.temaActual = '1';
-  selUnidad.value = letraNueva;
   
-  actualizarSelectorTemas();
+  // Actualizar selector y árbol
+  actualizarSelectorUnidades();
   
   saveToStorage();
   renderCards();
@@ -1986,25 +1979,13 @@ function borrarUnidad(unidad) {
   
   if (state.unidadActual === unidad) {
     state.unidadActual = Object.keys(state.datos)[0];
-    state.temaActual = Object.keys(state.datos[state.unidadActual])[0];
+    state.temaActual = Object.keys(state.datos[state.unidadActual]).filter(k => k !== '_nombre')[0] || '1';
   }
   
   unidadSeleccionadaModal = state.unidadActual;
   
   // Actualizar selectors en header
-  const selUnidad = document.getElementById('selUnidad');
-  selUnidad.innerHTML = '';
-  Object.keys(state.datos).forEach(u => {
-    const opt = document.createElement('option');
-    opt.value = u;
-    const nombreGuardado = state.datos[u]?._nombre || ('Unidad ' + u);
-    opt.textContent = nombreGuardado;
-    selUnidad.appendChild(opt);
-  });
-  selUnidad.value = state.unidadActual;
-  
-  // Actualizar temas
-  actualizarSelectorTemas();
+  actualizarSelectorUnidades();
   
   saveToStorage();
   renderCards();
