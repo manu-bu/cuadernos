@@ -72,11 +72,13 @@ header {
 .selector {
   height: var(--sel-h);
   border-radius: var(--sel-radius);
-  border: var(--sel-border) solid #c4956b;
-  background: #ffffff;
+  border: var(--sel-border) solid transparent;
+  background: 
+    linear-gradient(#5a3a1a, #5a3a1a) padding-box,
+    conic-gradient(#FFC93C, #F0932F, #C85A54, #FF4D9F, #8557D4, #17B8CE, #6FCF3D, #FFC93C) border-box;
   padding: 0 16px;
   font-size: 14px;
-  color: #2a2a2a;
+  color: #f5f0e8;
   font-weight: 700;
   font-family: var(--font);
   cursor: pointer;
@@ -99,6 +101,91 @@ header {
   background: #f9f9f7;
 }
 
+/* ===== CUSTOM SELECT ===== */
+.custom-select {
+  position: relative;
+  display: inline-block;
+  width: auto;
+}
+
+.select-display {
+  height: var(--sel-h);
+  border-radius: var(--sel-radius);
+  border: var(--sel-border) solid transparent;
+  background: 
+    linear-gradient(#5a3a1a, #5a3a1a) padding-box,
+    conic-gradient(#FFC93C, #F0932F, #C85A54, #FF4D9F, #8557D4, #17B8CE, #6FCF3D, #FFC93C) border-box;
+  padding: 0 16px;
+  font-size: 14px;
+  color: #f5f0e8;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.select-display::after {
+  content: '▼';
+  font-size: 10px;
+  margin-left: 4px;
+}
+
+.select-display:hover {
+  opacity: 0.9;
+}
+
+.select-options {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: #5a3a1a;
+  border: var(--sel-border) solid;
+  border-image: conic-gradient(#FFC93C, #F0932F, #C85A54, #FF4D9F, #8557D4, #17B8CE, #6FCF3D, #FFC93C) 1;
+  border-radius: 8px;
+  min-width: 100%;
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.select-options.show {
+  display: flex;
+}
+
+.select-option {
+  padding: 10px 16px;
+  color: #f5f0e8;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  transition: all 0.1s;
+  border-bottom: 1px solid rgba(245, 240, 232, 0.1);
+  font-family: var(--font);
+}
+
+.select-option:last-child {
+  border-bottom: none;
+}
+
+.select-option:hover {
+  background: rgba(245, 240, 232, 0.1);
+}
+
+.select-option.selected {
+  background: rgba(245, 240, 232, 0.15);
+  color: #FFC93C;
+}
+
 .header-right {
   display: flex;
   align-items: center;
@@ -109,12 +196,14 @@ header {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: var(--sel-border) solid #c4956b;
-  background: #ffffff;
+  border: var(--sel-border) solid transparent;
+  background: 
+    linear-gradient(#5a3a1a, #5a3a1a) padding-box,
+    conic-gradient(#FFC93C, #F0932F, #C85A54, #FF4D9F, #8557D4, #17B8CE, #6FCF3D, #FFC93C) border-box;
   font-size: 18px;
   font-weight: 700;
   font-family: var(--font);
-  color: #2a2a2a;
+  color: #f5f0e8;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -870,13 +959,15 @@ header {
 <!-- ===== HEADER ===== -->
 <header>
   <div class="header-left">
-    <select id="selUnidad" class="selector">
-      <option value="A">Unidad A</option>
-    </select>
+    <div class="custom-select" id="customSelUnidad">
+      <div class="select-display">Unidad A</div>
+      <div class="select-options"></div>
+    </div>
     
-    <select id="selTema" class="selector">
-      <option value="1">Tema 1</option>
-    </select>
+    <div class="custom-select" id="customSelTema">
+      <div class="select-display">Tema 1</div>
+      <div class="select-options"></div>
+    </div>
   </div>
   
   <div class="header-right">
@@ -1283,21 +1374,85 @@ function initData() {
 }
 
 function setupEventListeners() {
-  // Selectores
-  document.getElementById('selUnidad').addEventListener('change', (e) => {
-    state.unidadActual = e.target.value;
-    const temasDisponibles = Object.keys(state.datos[state.unidadActual]).filter(k => k !== '_nombre');
-    state.temaActual = temasDisponibles.length > 0 ? temasDisponibles[0] : '1';
-    state.tarjetaSeleccionada = null;
-    actualizarSelectorTemas();
-    renderCards();
+  // ===== CUSTOM SELECT - UNIDAD =====
+  const customSelUnidad = document.getElementById('customSelUnidad');
+  const displayUnidad = customSelUnidad.querySelector('.select-display');
+  const optionsUnidad = customSelUnidad.querySelector('.select-options');
+  
+  displayUnidad.addEventListener('click', (e) => {
+    e.stopPropagation();
+    optionsUnidad.classList.toggle('show');
   });
   
-  document.getElementById('selTema').addEventListener('change', (e) => {
-    state.temaActual = e.target.value;
-    state.tarjetaSeleccionada = null;
-    renderCards();
+  document.addEventListener('click', (e) => {
+    if (!customSelUnidad.contains(e.target)) {
+      optionsUnidad.classList.remove('show');
+    }
   });
+  
+  // ===== CUSTOM SELECT - TEMA =====
+  const customSelTema = document.getElementById('customSelTema');
+  const displayTema = customSelTema.querySelector('.select-display');
+  const optionsTema = customSelTema.querySelector('.select-options');
+  
+  displayTema.addEventListener('click', (e) => {
+    e.stopPropagation();
+    optionsTema.classList.toggle('show');
+  });
+  
+  document.addEventListener('click', (e) => {
+    if (!customSelTema.contains(e.target)) {
+      optionsTema.classList.remove('show');
+    }
+  });
+  
+  // Guardar referencias globales para actualizar
+  window.customSelectUnidad = {
+    display: displayUnidad,
+    options: optionsUnidad,
+    updateOptions: (items, current) => {
+      optionsUnidad.innerHTML = '';
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'select-option' + (item.value === current ? ' selected' : '');
+        div.textContent = item.label;
+        div.addEventListener('click', (e) => {
+          e.stopPropagation();
+          displayUnidad.textContent = item.label;
+          state.unidadActual = item.value;
+          const temasDisponibles = Object.keys(state.datos[state.unidadActual]).filter(k => k !== '_nombre');
+          state.temaActual = temasDisponibles.length > 0 ? temasDisponibles[0] : '1';
+          state.tarjetaSeleccionada = null;
+          actualizarSelectorTemas();
+          renderCards();
+          optionsUnidad.classList.remove('show');
+        });
+        optionsUnidad.appendChild(div);
+      });
+    }
+  };
+  
+  window.customSelectTema = {
+    display: displayTema,
+    options: optionsTema,
+    updateOptions: (items, current) => {
+      optionsTema.innerHTML = '';
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'select-option' + (item.value === current ? ' selected' : '');
+        div.textContent = item.label;
+        div.addEventListener('click', (e) => {
+          e.stopPropagation();
+          displayTema.textContent = item.label;
+          state.temaActual = item.value;
+          state.tarjetaSeleccionada = null;
+          renderCards();
+          optionsTema.classList.remove('show');
+        });
+        optionsTema.appendChild(div);
+      });
+    }
+  };
   
   // Botones
   document.getElementById('btnAddCard').addEventListener('click', addCard);
@@ -1716,8 +1871,6 @@ function editarNombreUnidad(unidad) {
 }
 
 function actualizarSelectorTemas() {
-  const selTema = document.getElementById('selTema');
-  selTema.innerHTML = '';
   if (state.datos[state.unidadActual]) {
     const temasDisponibles = Object.keys(state.datos[state.unidadActual])
       .filter(k => k !== '_nombre');  // Filtrar _nombre
@@ -1732,12 +1885,9 @@ function actualizarSelectorTemas() {
       saveToStorage();
     }
     
-    temasDisponibles.forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = t;
+    const items = temasDisponibles.map(t => {
       const nombreGuardado = state.datos[state.unidadActual][t]?._nombre || ('Tema ' + t);
-      opt.textContent = nombreGuardado;
-      selTema.appendChild(opt);
+      return { value: t, label: nombreGuardado };
     });
     
     // Convertir temaActual a string para comparar correctamente
@@ -1748,21 +1898,23 @@ function actualizarSelectorTemas() {
       state.temaActual = temasDisponibles[0];
     }
     
-    selTema.value = state.temaActual;
+    if (window.customSelectTema) {
+      window.customSelectTema.updateOptions(items, state.temaActual);
+      window.customSelectTema.display.textContent = items.find(i => i.value === state.temaActual)?.label || ('Tema ' + state.temaActual);
+    }
   }
 }
 
 function actualizarSelectorUnidades() {
-  const selUnidad = document.getElementById('selUnidad');
-  selUnidad.innerHTML = '';
-  Object.keys(state.datos).forEach(u => {
-    const opt = document.createElement('option');
-    opt.value = u;
+  const items = Object.keys(state.datos).map(u => {
     const nombreGuardado = state.datos[u]?._nombre || ('Unidad ' + u);
-    opt.textContent = nombreGuardado;
-    selUnidad.appendChild(opt);
+    return { value: u, label: nombreGuardado };
   });
-  selUnidad.value = state.unidadActual;
+  
+  if (window.customSelectUnidad) {
+    window.customSelectUnidad.updateOptions(items, state.unidadActual);
+    window.customSelectUnidad.display.textContent = items.find(i => i.value === state.unidadActual)?.label || ('Unidad ' + state.unidadActual);
+  }
   actualizarSelectorTemas();
 }
 
