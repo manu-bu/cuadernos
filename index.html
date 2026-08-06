@@ -298,6 +298,7 @@ header {
 
 .card.selected {
   box-shadow: 0 0 12px rgba(136, 204, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
 }
 
 /* Tipos de bordes predefinidos */
@@ -2739,7 +2740,7 @@ function renderCards() {
     document.getElementById('seccionEscala').style.display = 'none';
   }
   
-  tarjetas.forEach(card => {
+  tarjetas.forEach((card, index) => {
     const cardEl = document.createElement('div');
     cardEl.className = `card ${card.borde}`;
     if (state.tarjetaSeleccionada === card.id) {
@@ -2749,6 +2750,7 @@ function renderCards() {
     cardEl.style.left = card.x + 'px';
     cardEl.style.top = card.y + 'px';
     cardEl.style.transform = `scale(${card.scale})`;
+    cardEl.style.zIndex = card.zIndex !== undefined ? card.zIndex : (10 + index);
     cardEl.dataset.id = card.id;
     
     // Contenedor de contenido
@@ -3044,6 +3046,13 @@ function selectCard(id) {
   state.tarjetaSeleccionada = id;
   const tarjeta = state.datos[state.unidadActual][state.temaActual].tarjetas.find(c => c.id === id);
   if (tarjeta) {
+    // Actualizar z-index: poner esta tarjeta arriba de todas
+    const maxZIndex = Math.max(
+      ...state.datos[state.unidadActual][state.temaActual].tarjetas.map(t => t.zIndex || 0),
+      10
+    );
+    tarjeta.zIndex = maxZIndex + 1;
+    
     state.bordeSeleccionado = tarjeta.borde;
     state.colsSeleccionadas = tarjeta.cols;
     updateBordeButtons();
@@ -3056,6 +3065,8 @@ function selectCard(id) {
     // Actualizar slider
     document.getElementById('sliderEscala').value = tarjeta.scale;
     document.getElementById('escalaLabel').textContent = Math.round(tarjeta.scale * 100) + '%';
+    
+    saveToStorage();
   }
   renderCards();
 }
