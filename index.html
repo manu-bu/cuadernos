@@ -1182,14 +1182,6 @@ header {
     </div>
   </div>
   
-  <div class="panel-section">
-    <div class="panel-label">Aplicar a</div>
-    <div class="panel-buttons">
-      <button class="panel-btn" id="btnAplicarUna" style="color: #2a2a2a;">Esta tarjeta</button>
-      <button class="panel-btn" id="btnAplicarTodas" style="color: #2a2a2a;">Todas en tema</button>
-    </div>
-  </div>
-  
   <div class="panel-section" id="seccionGridAbierta" style="display: none;">
     <div class="panel-label">Filas y Columnas</div>
     <div class="panel-buttons">
@@ -1232,32 +1224,29 @@ header {
     <div class="panel-label">Estilo de Celda</div>
     
     <div style="margin-bottom: 12px;">
-      <div style="font-size: 11px; font-weight: 600; color: #6a6a68; margin-bottom: 6px; text-transform: uppercase;">Formato</div>
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
-        <button class="panel-btn" id="btnBoldOn" onclick="aplicarBold(true)" style="font-weight: 700; padding: 6px 2px; font-size: 14px;">B</button>
-        <button class="panel-btn" id="btnBoldOff" onclick="aplicarBold(false)" style="padding: 6px 2px; font-size: 12px;">N</button>
-        <button class="panel-btn" onclick="convertirAMayuscula()" style="padding: 6px 2px; font-size: 12px;">⬆M</button>
-        <button class="panel-btn" onclick="convertirAMinuscula()" style="padding: 6px 2px; font-size: 12px;">⬇m</button>
-      </div>
-    </div>
-    
-    <div style="margin-bottom: 12px;">
-      <div style="font-size: 11px; font-weight: 600; color: #6a6a68; margin-bottom: 6px; text-transform: uppercase;">Alineación</div>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
-        <button class="panel-btn" id="btnAlignLeft" onclick="aplicarAlineacion('left')">⬅ Izq</button>
-        <button class="panel-btn" id="btnAlignCenter" onclick="aplicarAlineacion('center')">⬆ Centro</button>
-        <button class="panel-btn" id="btnAlignRight" onclick="aplicarAlineacion('right')">Der ➡</button>
+      <div style="font-size: 11px; font-weight: 600; color: #6a6a68; margin-bottom: 6px; text-transform: uppercase;">Formato y Alineación</div>
+      <div style="background: #f9f9f7; padding: 8px; border-radius: 8px; border: 1.5px solid #C4956B;">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; justify-items: center;">
+          <button class="panel-btn" id="btnBoldToggle" onclick="aplicarBold(!state.boldActivo)" style="font-weight: 700; padding: 6px 2px; font-size: 14px; width: 100%;">B</button>
+          <button class="panel-btn" onclick="convertirAMayuscula()" style="padding: 6px 2px; font-size: 12px; width: 100%;">⬆M</button>
+          <button class="panel-btn" onclick="convertirAMinuscula()" style="padding: 6px 2px; font-size: 12px; width: 100%;">⬇m</button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; justify-items: center;">
+          <button class="panel-btn" id="btnAlignLeft" onclick="aplicarAlineacion('left')" style="width: 100%;">⬅ Izq</button>
+          <button class="panel-btn" id="btnAlignCenter" onclick="aplicarAlineacion('center')" style="width: 100%;">⬆ Centro</button>
+          <button class="panel-btn" id="btnAlignRight" onclick="aplicarAlineacion('right')" style="width: 100%;">Der ➡</button>
+        </div>
       </div>
     </div>
     
     <div style="margin-bottom: 12px;">
       <div style="font-size: 11px; font-weight: 600; color: #6a6a68; margin-bottom: 6px; text-transform: uppercase;">Tamaño</div>
-      <div id="tamanoSelector" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;"></div>
+      <div id="tamanoSelector" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: #f9f9f7; padding: 8px; border-radius: 8px; border: 1.5px solid #C4956B; justify-items: center;"></div>
     </div>
     
     <div style="margin-bottom: 12px;">
       <div style="font-size: 11px; font-weight: 600; color: #6a6a68; margin-bottom: 6px; text-transform: uppercase;">Color</div>
-      <div id="colorTextoSelector" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;"></div>
+      <div id="colorTextoSelector" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; background: #f9f9f7; padding: 12px; border-radius: 8px; border: 1.5px solid #C4956B;"></div>
     </div>
   </div>
 </div>
@@ -1702,15 +1691,6 @@ function setupEventListeners() {
   });
   
   // Panel editor - aplicar a
-  document.getElementById('btnAplicarUna').addEventListener('click', () => {
-    state.aplicarA = 'una';
-    updateAplicarButtons();
-  });
-  
-  document.getElementById('btnAplicarTodas').addEventListener('click', () => {
-    state.aplicarA = 'todas';
-    updateAplicarButtons();
-  });
   
   // Toggle desplegable de bordes
   const btnToggleBordes = document.getElementById('btnToggleBordes');
@@ -1730,8 +1710,11 @@ function setupEventListeners() {
     // Si clickeás en la mesa directamente (no en una tarjeta), deselecciona
     if (e.target === mesa) {
       state.tarjetaSeleccionada = null;
-      document.getElementById('seccionGridAbierta').style.display = 'none';
-      document.getElementById('seccionBorrar').style.display = 'none';
+      state.celdaSeleccionada = null;
+      const seccionGrid = document.getElementById('seccionGridAbierta');
+      const seccionBorrar = document.getElementById('seccionBorrar');
+      if (seccionGrid) seccionGrid.style.display = 'none';
+      if (seccionBorrar) seccionBorrar.style.display = 'none';
       renderCards();
     }
   });
@@ -2199,16 +2182,15 @@ function renderSelectorEstilos() {
   const textAlign = celda.textAlign || 'left';
   const color = celda.color || '#2A2A2A';
   
-  // Marcar botones de Bold
-  const btnBoldOn = document.getElementById('btnBoldOn');
-  const btnBoldOff = document.getElementById('btnBoldOff');
-  if (btnBoldOn && btnBoldOff) {
+  // Marcar botón de Bold
+  const btnBoldToggle = document.getElementById('btnBoldToggle');
+  if (btnBoldToggle) {
     if (bold) {
-      btnBoldOn.style.border = '2px solid #88cc00';
-      btnBoldOff.style.border = '1px solid #d4d4d2';
+      btnBoldToggle.style.border = '1.5px solid #C4956B';
+      btnBoldToggle.style.background = '#FFF8E7';
     } else {
-      btnBoldOn.style.border = '1px solid #d4d4d2';
-      btnBoldOff.style.border = '2px solid #88cc00';
+      btnBoldToggle.style.border = '1px solid #d4d4d2';
+      btnBoldToggle.style.background = '#ffffff';
     }
   }
   
@@ -2217,11 +2199,23 @@ function renderSelectorEstilos() {
   const btnAlignCenter = document.getElementById('btnAlignCenter');
   const btnAlignRight = document.getElementById('btnAlignRight');
   
-  [btnAlignLeft, btnAlignCenter, btnAlignRight].forEach(btn => btn.style.border = '1px solid #d4d4d2');
+  [btnAlignLeft, btnAlignCenter, btnAlignRight].forEach(btn => {
+    btn.style.border = '1px solid #d4d4d2';
+    btn.style.background = '#ffffff';
+  });
   
-  if (textAlign === 'left') btnAlignLeft.style.border = '2px solid #88cc00';
-  else if (textAlign === 'center') btnAlignCenter.style.border = '2px solid #88cc00';
-  else if (textAlign === 'right') btnAlignRight.style.border = '2px solid #88cc00';
+  if (textAlign === 'left') {
+    btnAlignLeft.style.border = '1.5px solid #C4956B';
+    btnAlignLeft.style.background = '#FFF8E7';
+  }
+  else if (textAlign === 'center') {
+    btnAlignCenter.style.border = '1.5px solid #C4956B';
+    btnAlignCenter.style.background = '#FFF8E7';
+  }
+  else if (textAlign === 'right') {
+    btnAlignRight.style.border = '1.5px solid #C4956B';
+    btnAlignRight.style.background = '#FFF8E7';
+  }
   
   // Tamaños
   const tamaños = [4, 6, 8, 10, 12, 14, 16, 18];
@@ -2231,14 +2225,20 @@ function renderSelectorEstilos() {
   tamaños.forEach(tam => {
     const btn = document.createElement('button');
     btn.textContent = tam;
-    btn.style.fontSize = '12px';
-    btn.style.padding = '8px 4px';
-    btn.style.borderRadius = '4px';
-    btn.style.border = fontSize === tam ? '2px solid #88cc00' : '1px solid #d4d4d2';
-    btn.style.background = '#f5f5f3';
+    btn.style.fontSize = '13px';
+    btn.style.fontWeight = '700';
+    btn.style.padding = '0px';
+    btn.style.borderRadius = '50%';
+    btn.style.border = fontSize === tam ? '1.5px solid #C4956B' : '1px solid #d4d4d2';
+    btn.style.background = fontSize === tam ? '#FFF8E7' : '#ffffff';
     btn.style.color = '#2a2a2a';
     btn.style.cursor = 'pointer';
     btn.style.transition = 'all 0.2s';
+    btn.style.width = '36px';
+    btn.style.height = '36px';
+    btn.style.display = 'flex';
+    btn.style.alignItems = 'center';
+    btn.style.justifyContent = 'center';
     
     btn.addEventListener('click', () => {
       const celdaActiva = state.celdaSeleccionada;
@@ -2279,10 +2279,10 @@ function renderSelectorEstilos() {
   
   COLORES_TEXTO.forEach(col => {
     const btn = document.createElement('button');
-    btn.style.width = '100%';
-    btn.style.height = '30px';
-    btn.style.borderRadius = '4px';
-    btn.style.border = color === col.valor ? '3px solid #000' : '1px solid #d4d4d2';
+    btn.style.width = '36px';
+    btn.style.height = '36px';
+    btn.style.borderRadius = '50%';
+    btn.style.border = color === col.valor ? '3px solid #000' : '2px solid #e0e0de';
     btn.style.background = col.valor;
     btn.style.cursor = 'pointer';
     btn.style.transition = 'all 0.2s';
@@ -3397,14 +3397,24 @@ function selectCard(id) {
     state.colsSeleccionadas = tarjeta.cols;
     updateBordeButtons();
     updateColsButtons();
-    document.getElementById('seccionGridAbierta').style.display = 'block';
-    document.getElementById('seccionBorrar').style.display = 'block';
-    document.getElementById('seccionDuplicar').style.display = 'block';
-    document.getElementById('seccionVaciar').style.display = 'block';
-    document.getElementById('seccionEscala').style.display = 'block';
+    
+    const seccionGrid = document.getElementById('seccionGridAbierta');
+    const seccionBorrar = document.getElementById('seccionBorrar');
+    const seccionDuplicar = document.getElementById('seccionDuplicar');
+    const seccionVaciar = document.getElementById('seccionVaciar');
+    const seccionEscala = document.getElementById('seccionEscala');
+    
+    if (seccionGrid) seccionGrid.style.display = 'block';
+    if (seccionBorrar) seccionBorrar.style.display = 'block';
+    if (seccionDuplicar) seccionDuplicar.style.display = 'block';
+    if (seccionVaciar) seccionVaciar.style.display = 'block';
+    if (seccionEscala) seccionEscala.style.display = 'block';
+    
     // Actualizar slider
-    document.getElementById('sliderEscala').value = tarjeta.scale;
-    document.getElementById('escalaLabel').textContent = Math.round(tarjeta.scale * 100) + '%';
+    const sliderEscala = document.getElementById('sliderEscala');
+    const escalaLabel = document.getElementById('escalaLabel');
+    if (sliderEscala) sliderEscala.value = tarjeta.scale;
+    if (escalaLabel) escalaLabel.textContent = Math.round(tarjeta.scale * 100) + '%';
     
     saveToStorage();
   }
