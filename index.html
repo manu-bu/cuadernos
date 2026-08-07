@@ -301,6 +301,52 @@ header {
   z-index: 1000;
 }
 
+.card.colapsada {
+  max-width: 200px !important;
+  min-width: 150px !important;
+  padding: 8px 8px !important;
+  height: auto !important;
+}
+
+.card.colapsada .card-grid {
+  display: none !important;
+}
+
+.card.colapsada .collapse-btn {
+  display: block !important;
+}
+
+.collapse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1.5px solid #ccc;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0px;
+  transition: all 0.2s;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+}
+
+.collapse-btn:hover {
+  background: #f5f5f5;
+  border-color: #bbb;
+}
+
+.card .collapse-btn {
+  display: block;
+  pointer-events: auto;
+}
+
 /* Tipos de bordes predefinidos */
 .card.borde-simple {
   border: var(--card-border-w) solid #d4d4d2;
@@ -2804,6 +2850,7 @@ function addCard() {
     scale: 1.875,
     borde: 'borde-simple',
     cols: 2,
+    colapsada: false,
     titulo: {
       texto: 'Nueva tarjeta',
       fontSize: 10,
@@ -2944,6 +2991,9 @@ function renderCards() {
     if (state.tarjetaSeleccionada === card.id) {
       cardEl.classList.add('selected');
     }
+    if (card.colapsada) {
+      cardEl.classList.add('colapsada');
+    }
     
     cardEl.style.left = card.x + 'px';
     cardEl.style.top = card.y + 'px';
@@ -2989,9 +3039,66 @@ function renderCards() {
     title.style.textAlign = titleAlign;
     title.textContent = titleTexto;
     
+    // Contenedor de título con botón collapse
+    const titleContainer = document.createElement('div');
+    titleContainer.style.display = 'flex';
+    titleContainer.style.alignItems = 'flex-start';
+    titleContainer.style.justifyContent = 'space-between';
+    titleContainer.style.gap = '8px';
+    titleContainer.style.marginBottom = '0px';
+    
+    // Hacer que el título se estire
+    title.style.flex = '1';
+    title.style.minWidth = '0';
+    
+    // Botón de collapse (como div)
+    const collapseBtn = document.createElement('div');
+    collapseBtn.className = 'collapse-btn';
+    collapseBtn.textContent = '';
+    collapseBtn.style.cursor = 'pointer';
+    collapseBtn.style.userSelect = 'none';
+    collapseBtn.style.pointerEvents = 'auto';
+    collapseBtn.style.position = 'absolute';
+    collapseBtn.style.top = '8px';
+    collapseBtn.style.right = '8px';
+    collapseBtn.style.zIndex = '100';
+    
+    const toggleCollapse = function(e) {
+      console.log('Toggle collapse clicked');
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      card.colapsada = !card.colapsada;
+      console.log('Card colapsada now:', card.colapsada);
+      if (card.colapsada) {
+        cardEl.classList.add('colapsada');
+      } else {
+        cardEl.classList.remove('colapsada');
+      }
+      saveToStorage();
+    };
+    
+    collapseBtn.addEventListener('mousedown', toggleCollapse, true);
+    collapseBtn.addEventListener('pointerdown', toggleCollapse, true);
+    
+    titleContainer.appendChild(title);
+    
+    // Listener para clicks en el container del título
+    titleContainer.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (e.target === collapseBtn || e.target.closest('.collapse-btn')) {
+        e.stopPropagation();
+        return; // Dejar que el listener del botón lo maneje
+      }
+    });
+    
     // Al clickear, pasar a editable
     title.addEventListener('click', (e) => {
       e.stopPropagation();
+      // No hacer nada si se clickeó el botón
+      if (e.target.classList.contains('collapse-btn')) {
+        return;
+      }
       state.celdaSeleccionada = { tarjetaId: card.id, esTitle: true };
       title.contentEditable = 'true';
       title.focus();
@@ -3021,7 +3128,7 @@ function renderCards() {
         title.blur();
       }
     });
-    contentContainer.appendChild(title);
+    contentContainer.appendChild(titleContainer);
     
     // Grid
     const grid = document.createElement('div');
@@ -3248,9 +3355,14 @@ function renderCards() {
     
     contentContainer.appendChild(grid);
     cardEl.appendChild(contentContainer);
+    cardEl.appendChild(collapseBtn);
     
     // Eventos de la tarjeta
     cardEl.addEventListener('pointerdown', (e) => {
+      // Si clickeás el botón collapse, que no haga nada
+      if (e.target.classList.contains('collapse-btn') || e.target.closest('.collapse-btn')) {
+        return;
+      }
       // Si clickeás una celda, que se enfoque para editar
       if (e.target.classList.contains('cell')) {
         e.target.focus();
